@@ -1,0 +1,44 @@
+# Use soft, dark text colors for readability on light background
+command_timeout = 2000
+
+format = """
+$directory$git_branch$git_status$python$nodejs$cmd_duration$jobs$character
+"""
+
+add_newline = true
+
+[directory]
+style = "blue"
+read_only = " "
+read_only_style = "red"
+truncate_to_repo = true
+truncation_length = 3
+
+[git_branch]
+symbol = " "
+style = "magenta"
+
+[git_status]
+style = "cyan"
+format = '([\[$all_status$ahead_behind\]]($style) )'
+
+[python]
+style = "yellow"
+symbol = "🐍 "
+
+[nodejs]
+style = "green"
+symbol = "⬢ "
+
+[cmd_duration]
+style = "bold black"
+
+[character]
+success_symbol = "[❯](bold green)"
+error_symbol = "[❯](bold red)"
+vimcmd_symbol = "[❮](bold blue)"
+
+[jobs]
+style = "blue"
+symbol = "✦"
+number_threshold = 1
