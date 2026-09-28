@@ -49,6 +49,15 @@ cd ~/github/workstation
 
 Push access comes later, once `gh` is installed: `gh auth login`, then `gh auth setup-git`. SSH keys are restored or created by hand (step 9); key material never enters this repository.
 
+A Mac that should hold no credential for this repository's account, such as a work Mac, never needs push access. Commit there, carry the new commits to a Mac that can push as a bundle file, and push from that one:
+
+```bash
+git bundle create /Volumes/<usb>/workstation.bundle origin/main..main   # on the Mac without access
+git pull /Volumes/<usb>/workstation.bundle main && git push              # on the Mac with access
+```
+
+Push before either Mac commits again, then `git pull` on the first one. The repository is public, so pulling over HTTPS needs no login.
+
 `OPEN:` untested on a bare machine.
 
 ## Step 3 — Install Nix
@@ -134,7 +143,7 @@ Note `sudo` on the switch but not the build. Do not substitute a moving `nix-dar
 
 **Which configuration:** each Mac is `hosts/<name>`, and the name is a label, not necessarily the Mac's host name (a fresh install's host name matches nothing). Pass it explicitly on a new Mac: `./scripts/bootstrap.sh --host <name>`. Activation writes it to `/etc/workstation-host`, where later runs, `ws` and Neovim read it. Without `--host` and before a first activation, the script tries the Mac's host name, reports that as `todo`, and stops with the list of available names if no `hosts/<name>` matches.
 
-`OPEN:` the `--host` first run is untested on a bare machine.
+`OPEN:` the `--host` first run is untested on a bare machine. It has run once on a previously used Mac, cleaned of its old Homebrew tools and dotfiles first (macOS 27.0, Nix 2.35.2): the first activation succeeded with no manual fix.
 
 **If the first activation fails**, generation rollback does not apply: there is no previous generation. A build failure changes nothing, but a switch can fail after activation has already changed part of the system. Inspect the machine before retrying. If nix-darwin was installed, remove it first with `sudo nix run nix-darwin#darwin-uninstaller`; only then use `/nix/nix-installer uninstall` if you also want to remove Nix.
 

@@ -49,5 +49,6 @@
       packages.aarch64-darwin.darwin-rebuild = nix-darwin.packages.aarch64-darwin.darwin-rebuild;
 
       darwinConfigurations.personal = mkHost "personal";
+      darwinConfigurations.work = mkHost "work";
     };
 }

@@ -26,6 +26,16 @@ Until that file exists Git refuses to commit ("Author identity unknown")
 instead of guessing an address from the host name. Check with
 `git config user.email`.
 
+One repository can commit with a different address than the rest of the
+machine, for example this one on a work Mac. Set it in that repository's own
+`.git/config`, which is never committed and wins over the machine file:
+
+```bash
+git -C ~/github/workstation config user.email "you@example.com"
+```
+
+`git config --show-origin user.email` shows which file the address came from.
+
 ## Secret scan before every commit
 
 Every `git commit`, in every repository, first runs **gitleaks** over the
