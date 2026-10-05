@@ -1,68 +1,205 @@
 # Claude Code configuration
 
-Claude Code itself is a Homebrew cask that updates itself. This repository
-manages only the **shared** part of its user configuration
-(`modules/home/claude/`); everything personal stays on each machine.
+Claude Code is a Homebrew cask, and it updates itself. This repository manages
+only the shared part of its user configuration, from `modules/home/claude/`.
+All personal configuration stays on each Mac.
 
 ## What is shared and what is not
 
-| Thing | Where | Shared via this repo? |
+| Item | Location | Shared through this repository |
 |---|---|---|
-| Rules for every project, e.g. the file-deletion rule | `~/.claude/rules/*.md` | **Yes**, read-only links |
-| Status line script | `~/.claude/statusline-command.sh` | **Yes**, read-only link |
-| `personal-writing-style` skill | `~/.claude/skills/personal-writing-style/SKILL.md` | **Yes**, read-only link; edit `modules/home/claude/skills/`, then `ws switch` |
-| `statusLine`, the delete-command `ask` rules and the Keychain `deny` rules | `~/.claude/settings.json` | **Yes**, merged in on every activation |
-| Model, theme, TUI, anything else in `settings.json` | `~/.claude/settings.json` | No, per machine; change freely with `/model`, `/config` |
-| Personal instructions (`#` and `/memory` edits) | `~/.claude/CLAUDE.md` | No, per machine and private |
-| Auto memory ("Saved 2 memories") | `~/.claude/projects/<project>/memory/` | No, machine-local by design |
-| Project instructions | each repository's `CLAUDE.md` | Belongs to that repository |
+| The rules for all projects, for example the file deletion rule | `~/.claude/rules/*.md` | Yes, as read-only links |
+| The status line script | `~/.claude/statusline-command.sh` | Yes, as a read-only link |
+| The `personal-writing-style` skill | `~/.claude/skills/personal-writing-style/SKILL.md` | Yes, as a read-only link |
+| `statusLine`, the `ask` rules for delete commands and the `deny` rules for the Keychain | `~/.claude/settings.json` | Yes. Each activation merges them into the file |
+| The model, the theme, the TUI and all other keys of `settings.json` | `~/.claude/settings.json` | No. Change them with `/model` and `/config` |
+| Personal instructions (from `#` and `/memory`) | `~/.claude/CLAUDE.md` | No. They are private and stay on the Mac |
+| Auto memory (the message "Saved 2 memories") | `~/.claude/projects/<project>/memory/` | No. It stays on the Mac |
+| Project instructions | The `CLAUDE.md` of each repository | They are a part of that repository |
 
-So work and private memories never mix, and nothing personal reaches this
-public repository.
+This has two results. Work memories and private memories do not mix. No
+personal data gets into this public repository.
 
-## Common workflows
+## How the merge of settings.json works
 
-**Change the default model on this Mac only:** `/model` inside Claude Code.
-Nothing else to do; activation never touches `model`.
+Activation does not replace `~/.claude/settings.json`. It changes three keys
+and keeps all other keys:
 
-**Add a rule for every project on every Mac:** create
-`modules/home/claude/<topic>.md`, add it to `default.nix` next to
-`file-deletion.md` as `home.file.".claude/rules/<topic>.md".source`, then
-`ws switch`. One topic per file; keep rules short.
+- It sets `statusLine` to the value in `settings.shared.json`.
+- It adds the shared `permissions.ask` rules that the file does not have.
+- It adds the shared `permissions.deny` rules that the file does not have.
 
-**Add a note for this Mac only:** start a message with `#`, or use `/memory`
-and pick the user `CLAUDE.md`. It lands in `~/.claude/CLAUDE.md`.
+Example: the file on a Mac before an activation.
 
-**Change the status line:** edit `modules/home/claude/statusline-command.sh`,
-`ws switch`, restart Claude Code. Editing `~/.claude/statusline-command.sh`
-directly is not possible; it is a read-only link.
+```json
+{
+  "model": "opus",
+  "permissions": {
+    "ask": ["Bash(docker system prune *)"]
+  }
+}
+```
 
-**Add a shared permission rule:** add it to `permissions.ask` (Claude asks
-first) or `permissions.deny` (Claude may never run it) in
-`modules/home/claude/settings.shared.json`, `ws switch`. The `deny` list blocks
-the commands that print Keychain secrets: Claude Code's commands run as you,
-and some Keychain items, such as `gh`'s token, can be read back without a
-macOS prompt.
+The same file after the activation. The model and the rule of the Mac stay.
+The lists are shortened in this example.
 
-**Remove a shared permission rule:** remove it from `settings.shared.json`
-*and* delete it by hand from `~/.claude/settings.json` on each Mac. The merge
-only ever adds entries, so it never removes a rule a machine already has.
-Conversely, a shared rule deleted inside Claude Code comes back at the next
-`ws switch`.
+```json
+{
+  "model": "opus",
+  "statusLine": {
+    "type": "command",
+    "command": "bash ~/.claude/statusline-command.sh"
+  },
+  "permissions": {
+    "ask": ["Bash(docker system prune *)", "Bash(rm *)", "Bash(rmdir *)"],
+    "deny": ["Bash(security find-generic-password *)", "Bash(gh auth token*)"]
+  }
+}
+```
 
-## If activation warns about settings.json
+## Usual tasks
 
-"`settings.json` is not valid JSON; shared Claude Code settings were not
-merged" means the file is damaged. It is left exactly as it is. Fix or restore
-it, then `ws switch` again. Check it with `jq . ~/.claude/settings.json`.
+### Change the default model on this Mac only
+
+Run `/model` in Claude Code. No other step is necessary, because activation
+does not change `model`.
+
+### Add a rule for all projects on all Macs
+
+This example adds a rule about commit messages.
+
+1. Create `modules/home/claude/commit-messages.md`:
+
+   ```markdown
+   # Commit messages
+
+   - Write the subject line as a command, with a maximum of 60 characters.
+   - Do not add a co-author line.
+   ```
+
+2. Add the file to `modules/home/claude/default.nix`, below the line for
+   `file-deletion.md`:
+
+   ```nix
+   home.file.".claude/rules/commit-messages.md".source = ./commit-messages.md;
+   ```
+
+3. Run `ws switch`.
+4. Start Claude Code again and run `/memory`. The list must contain the new
+   file.
+
+Write one file for each topic, and keep each rule short.
+
+### Add a note for this Mac only
+
+There are two procedures:
+
+- Start a message with `#`, for example `# This Mac has no Docker VM`.
+- Run `/memory` and select the user `CLAUDE.md`.
+
+The note goes into `~/.claude/CLAUDE.md`.
+
+### Change the status line
+
+1. Edit `modules/home/claude/statusline-command.sh`.
+2. Run `ws switch`.
+3. Start Claude Code again.
+
+You cannot edit `~/.claude/statusline-command.sh` directly, because it is a
+read-only link.
+
+To do a test of the script without Claude Code, send it JSON on standard
+input:
+
+```bash
+echo '{"cwd":"'"$PWD"'"}' | bash modules/home/claude/statusline-command.sh
+```
+
+The command prints the status line for the current directory: the directory
+name, the Git branch and the Git status.
+
+### Add a shared permission rule
+
+Add the rule to `modules/home/claude/settings.shared.json` and run `ws switch`.
+Use one of the two lists:
+
+| List | Effect |
+|---|---|
+| `permissions.ask` | Claude asks before it runs the command |
+| `permissions.deny` | Claude cannot run the command |
+
+Example: make Claude ask before it uninstalls a Homebrew package.
+
+```json
+"ask": [
+  "Bash(rm *)",
+  "Bash(brew uninstall *)"
+]
+```
+
+After the activation, make sure that the rule is in the file of the Mac:
+
+```console
+$ jq '.permissions.ask' ~/.claude/settings.json
+[
+  "Bash(rm *)",
+  "Bash(rmdir *)",
+  "Bash(unlink *)",
+  "Bash(trash *)",
+  "Bash(git clean *)",
+  "Bash(find * -delete*)",
+  "Bash(brew uninstall *)"
+]
+```
+
+The `deny` list blocks the commands that print secrets from the Keychain. The
+commands of Claude Code run as your user. Some Keychain items, for example the
+token of `gh`, are readable without a macOS prompt.
+
+### Remove a shared permission rule
+
+The merge only adds entries. It does not remove a rule that a Mac has. Thus a
+removal has two steps:
+
+1. Remove the rule from `settings.shared.json`.
+2. On each Mac, open `~/.claude/settings.json` in an editor and delete the
+   rule.
+
+The opposite also applies. If you delete a shared rule in Claude Code, the
+next `ws switch` adds it again.
+
+## If activation shows a warning about settings.json
+
+The warning is:
+
+```text
+/Users/alice/.claude/settings.json is not valid JSON; shared Claude Code settings were not merged
+```
+
+The file has a syntax error. Activation does not change the file.
+
+1. Find the error. In this example, a comma is missing at the end of line 2:
+
+   ```console
+   $ jq . ~/.claude/settings.json
+   jq: parse error: Expected separator between values at line 3, column 15
+   ```
+
+2. Repair the file, or restore it from a backup.
+3. Run `ws switch` again.
 
 ## Claude Code and Neovim
 
-With Neovim open in the same project, `/ide` in Claude Code connects the two:
-Claude sees the current file and selection, and proposed edits open as diffs
-in Neovim. Keys are under `Space a` ([neovim.md](neovim.md#claude-code-in-the-editor)).
+Open Neovim in the project. Then run `/ide` in Claude Code to connect the two.
+Claude sees the current file and the selection, and Neovim shows each proposed
+edit as a diff.
 
-## Checking what Claude Code loaded
+The keys start with `Space a`. See
+[neovim.md](neovim.md#claude-code-in-the-editor).
 
-Inside Claude Code, `/memory` lists the loaded instruction files (the rules file
-among them) and `/status` shows the settings sources.
+## See what Claude Code loaded
+
+| Command in Claude Code | Result |
+|---|---|
+| `/memory` | Shows the instruction files that Claude Code loaded. The rule files are in this list |
+| `/status` | Shows the sources of the settings |

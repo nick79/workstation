@@ -1,31 +1,45 @@
 # Claude Code configuration
 
-Home Manager module for the shared part of the Claude Code user configuration.
-How to use and change it: [`docs/tools/claude-code.md`](../../../docs/tools/claude-code.md).
+This directory is the Home Manager module for the shared part of the Claude
+Code user configuration. The guide
+[`docs/tools/claude-code.md`](../../../docs/tools/claude-code.md) describes how
+to use it and how to change it.
 
-| File | Becomes | How |
+## The files
+
+| File | Target | Method |
 |---|---|---|
-| `file-deletion.md` | `~/.claude/rules/file-deletion.md` | Read-only link. Claude Code loads every file in `~/.claude/rules/` for every project |
-| `statusline-command.sh` | `~/.claude/statusline-command.sh` | Read-only link, executable |
-| `settings.shared.json` | Three keys of `~/.claude/settings.json` | Merged on activation by `default.nix`: `statusLine` is set, `permissions.ask` and `permissions.deny` gain missing entries. Every other key stays per machine |
-| `skills/personal-writing-style/SKILL.md` | `~/.claude/skills/personal-writing-style/SKILL.md` | Read-only link: a Claude Code skill for writing prose in the owner's voice |
-| `default.nix` | — | The module |
+| `file-deletion.md` | `~/.claude/rules/file-deletion.md` | A read-only link. Claude Code loads each file in `~/.claude/rules/` for all projects |
+| `statusline-command.sh` | `~/.claude/statusline-command.sh` | A read-only link that is executable |
+| `settings.shared.json` | Three keys of `~/.claude/settings.json` | `default.nix` merges them on activation. It sets `statusLine`, and it adds the entries that `permissions.ask` and `permissions.deny` do not have. All other keys stay as they are on the Mac |
+| `skills/personal-writing-style/SKILL.md` | `~/.claude/skills/personal-writing-style/SKILL.md` | A read-only link. This Claude Code skill writes prose in the voice of the owner |
+| `default.nix` | None | The module |
 
-Not managed, on purpose: the rest of `settings.json` (model, theme, TUI),
-`~/.claude/CLAUDE.md` (private per-machine instructions), auto memory under
-`~/.claude/projects/`, and all session state. Home Manager must never take the
-whole `~/.claude/` directory.
+## What the module does not manage
+
+The module does not manage these items:
+
+- The other keys of `settings.json`, for example the model, the theme and the
+  TUI
+- `~/.claude/CLAUDE.md`, the private instructions of one Mac
+- The auto memory in `~/.claude/projects/`
+- All session state
+
+Home Manager must not manage the full `~/.claude/` directory. If it does, all
+files in the directory become read-only links. Claude Code then cannot write
+its settings, its memory or its session state.
 
 ## Safety
 
-- No credentials, tokens or API keys. The status-line script only reads the
-  JSON that Claude Code pipes to it on stdin.
-- No hardcoded home paths; the script uses `$HOME` and the `cwd` from that
-  JSON, so it works for any user on any Mac.
+- The files contain no credentials, tokens or API keys. The status line script
+  reads only the JSON that Claude Code sends to its standard input.
+- The files contain no fixed home paths. The script uses `$HOME` and the `cwd`
+  value from that JSON. Thus it works for each user on each Mac.
 
 ## Runtime dependencies
 
-`jq` (from Nix), plus `git`, `awk`, `date` and `bc`.
-`bc` comes from the macOS base system and is used once, for the session-cost
-line; without it that line degrades silently rather than breaking the status
-line.
+The status line script uses `jq` from Nix, and `git`, `awk`, `date` and `bc`.
+
+`bc` comes with macOS. The script uses it one time, for the cost of the
+session. Without `bc`, the status line does not show the cost, and its other
+parts continue to work.

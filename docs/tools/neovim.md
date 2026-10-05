@@ -1,529 +1,835 @@
 # Neovim
 
-Neovim is built with NixVim from `nixvim/` in this repository. There is
-no plugin manager and nothing is downloaded at runtime: every plugin comes
-from Nix. To change the editor, edit `nixvim/`, then run `ws build` and
-`ws switch`. Editing `~/.config/nvim/init.lua` does nothing lasting, because it
-is a link into the Nix store.
+NixVim builds Neovim from the `nixvim/` directory of this repository. The
+editor has no plugin manager, and it downloads no plugins while it runs. All
+plugins come from Nix.
 
-The leader key is `Space`. Press it and wait: which-key lists what comes next.
-It works the same after `g`, `z`, `[`, `]` and `<C-w>`.
+To change the editor, edit the files in `nixvim/`. Then run `ws build` and
+`ws switch`. A change to `~/.config/nvim/init.lua` does not last, because that
+file is a link into the Nix store.
 
-## Everyday keys
+The leader key is `Space`. Press `Space` and wait. which-key then shows the
+keys that can follow. which-key does the same after `g`, `z`, `[`, `]` and
+`Ctrl-w`.
 
-| Keys | Does |
+In this guide, `Space f f` means: press `Space`, then `f`, then `f`.
+
+## Daily keys
+
+| Keys | Action |
 |---|---|
-| `Ctrl-S` | Save, in any mode |
-| `Esc` | Also clears search highlighting |
+| `Ctrl-S` | Save, in all modes |
+| `Esc` | Also removes the search highlight |
 | `Space Space` | Find a file |
-| `Space /` | Grep the project |
-| `Space ,` | Switch buffer |
-| `Space e` | File explorer (also opens for `nvim .`) |
-| `Shift-H` / `Shift-L` | Previous / next buffer |
-| `Ctrl-h/j/k/l` | Move between windows |
-| `Space -` / `Space \|` | Split below / right |
-| `Space q q` | Quit everything (asks about unsaved files) |
+| `Space /` | Search for text in the project (grep) |
+| `Space ,` | Go to a different buffer |
+| `Space e` | Open the file explorer. `nvim .` also opens it |
+| `Shift-H` / `Shift-L` | Go to the previous / next buffer |
+| `Ctrl-h` / `Ctrl-j` / `Ctrl-k` / `Ctrl-l` | Go to the window on the left / below / above / on the right |
+| `Space -` / `Space \|` | Split the window below / to the right |
+| `Space q q` | Quit Neovim. It asks about files that are not saved |
 
-`j` and `k` move by screen line in wrapped text; with a count (`5j`) they move
-by real line, so relative numbers still work.
+`j` and `k` move by screen line in wrapped text. With a count, for example
+`5j`, they move by real line. Thus relative line numbers continue to work.
 
-## Finding things: `Space f` and `Space s`
+### Example: open a project and find a setting
 
-Every picker works the same way: type to filter, `Ctrl-j`/`Ctrl-k` or the
-arrows to move, `Enter` to open, `Ctrl-v`/`Ctrl-s` to open in a vertical /
-horizontal split, `Esc` to close. `Space s R` reopens the last picker where you
-left it.
+1. Start Neovim in the repository:
+
+   ```bash
+   cd ~/github/workstation
+   nvim .
+   ```
+
+2. Press `Space Space`, type `shell`, and press `Enter`. Neovim opens
+   `modules/home/shell.nix`.
+3. Press `Space /` and type `stateVersion`. The picker shows each line that
+   contains the text.
+4. Press `Ctrl-v` on a match to open it in a vertical split.
+5. Press `Ctrl-h` and `Ctrl-l` to move between the two windows.
+6. Press `Space q q` to quit.
+
+## Find things: `Space f` and `Space s`
+
+All pickers work in the same way:
+
+| Keys in a picker | Action |
+|---|---|
+| Text | Filter the list |
+| `Ctrl-j` / `Ctrl-k`, or the arrow keys | Move in the list |
+| `Enter` | Open the item |
+| `Ctrl-v` / `Ctrl-s` | Open the item in a vertical / horizontal split |
+| `Esc` | Close the picker |
+
+`Space s R` opens the last picker again, in the state that it had when you
+closed it.
 
 | Keys | Picker |
 |---|---|
-| `Space f f` | Files (respects `.gitignore`) |
-| `Space f F` | Files, including hidden and ignored ones |
+| `Space f f` | Files. It obeys `.gitignore` |
+| `Space f F` | Files, with hidden files and ignored files |
 | `Space f r` | Recent files |
 | `Space f b` | Buffers |
-| `Space f c` | This repository's `nixvim/` configuration |
-| `Space f n` | New empty file |
+| `Space f c` | The `nixvim/` configuration of this repository |
+| `Space f n` | A new empty file |
 | `Space s g` | Grep |
-| `Space s w` | Grep the word under the cursor, or the selection |
+| `Space s w` | Grep for the word at the cursor, or for the selection |
 | `Space s b` | Lines in the current buffer |
 | `Space s h` / `s k` / `s C` | Help pages / keymaps / commands |
-| `Space s u` | Undo history. Undo survives closing the file |
+| `Space s u` | Undo history. The history stays after you close the file |
 | `Space s m` / `s j` / `s "` | Marks / jumps / registers |
 | `Space s M` | Man pages |
-| `Space s q` / `s l` | Quickfix / location list entries |
+| `Space s q` / `s l` | Quickfix list / location list |
 | `Space :` | Command history |
+
+### Examples
+
+Find all uses of a word:
+
+1. Put the cursor on the word.
+2. Press `Space s w`.
+3. Type more text to make the list smaller, then press `Enter` on a line.
+
+Find the key for an action:
+
+1. Press `Space s k`.
+2. Type a word from the action, for example `rename`.
+3. Read the key in the list.
+
+Go back to an old state of a file:
+
+1. Press `Space s u`.
+2. Move in the list. The preview shows the difference for each state.
+3. Press `Enter` to restore that state.
 
 ## Buffers, windows and tabs
 
-| Keys | Does |
+| Keys | Action |
 |---|---|
-| `Space b b` | Previous buffer (the `#` file) |
-| `Space b d` | Close the buffer, keep the window |
-| `Space b o` | Close every other buffer |
-| `Space w` | All `<C-w>` window commands, listed by which-key |
+| `Space b b` | Go to the previous buffer (the `#` file) |
+| `Space b d` | Close the buffer and keep the window |
+| `Space b o` | Close all other buffers |
+| `Space w` | Show all `Ctrl-w` window commands in which-key |
 | `Space w d` | Close the window |
-| `Space w m` | Maximise or restore the window |
-| `Ctrl-arrows` | Resize the window |
-| `Space Tab Tab` | New tab |
-| `Space Tab ]` / `[` | Next / previous tab |
-| `Space Tab d` / `o` | Close the tab / every other tab |
-| `Space x q` / `x l` | Open or close the quickfix / location list |
+| `Space w m` | Make the window as large as possible, or restore it |
+| `Ctrl` + arrow keys | Change the size of the window |
+| `Space Tab Tab` | Open a new tab |
+| `Space Tab ]` / `[` | Go to the next / previous tab |
+| `Space Tab d` / `o` | Close the tab / all other tabs |
+| `Space x q` / `x l` | Open or close the quickfix list / the location list |
 
-In help, quickfix and `:checkhealth` windows, `q` closes the window.
+In a help window, a quickfix window or a `:checkhealth` window, `q` closes the
+window.
 
-The buffer bar at the top appears once more than one buffer is open.
+The buffer bar at the top shows when more than one buffer is open.
 
 ## Toggles: `Space u`
 
-| Keys | Toggles |
+Most toggles show a message with their new state, and which-key shows their
+current state.
+
+| Keys | Toggle |
 |---|---|
-| `Space u s` | Spell checking |
+| `Space u s` | Spell check |
 | `Space u w` | Soft wrap |
-| `Space u l` / `u L` | Line numbers / relative numbers |
-| `Space u z` | Zen mode: one centred 120-column window |
-| `Space u Z` | Zoom the current window |
-| `Space u n` | Dismiss notifications (`Space n` shows their history) |
-| `Space u C` | Try another colour scheme for this session |
-| `Space u t` | Pinned function/class context at the top |
-| `Space u p` | Auto-closing brackets and quotes |
+| `Space u l` / `u L` | Line numbers / relative line numbers |
+| `Space u z` | Zen mode: one window of 120 columns in the centre |
+| `Space u Z` | Zoom of the current window |
+| `Space u n` | Hide the notifications. `Space n` shows their history |
+| `Space u C` | Use a different colour scheme for this session |
+| `Space u t` | The function or class context at the top of the window |
+| `Space u p` | Automatic pairs of brackets and quotes |
 | `Space u G` | Git signs |
 | `Space u d` | Diagnostics |
 | `Space u h` | Inlay hints |
-| `Space u f` / `u F` | Format on save, everywhere / this buffer |
+| `Space u f` / `u F` | Format on save, for all buffers / for this buffer |
 | `Space u m` | Rendered Markdown |
 
 ## Text objects and motions
 
-Operators (`d`, `c`, `y`, `v`, ...) combine with text objects: `a` takes the
-whole thing, `i` the inside. `daf` deletes a function, `ci"` changes inside
-quotes, `vic` selects a class body. They find the next match if the cursor is
-not inside one, and a count reaches outwards (`2dib`).
+An operator (`d`, `c`, `y`, `v`) works together with a text object. `a` selects
+the full object, and `i` selects its contents.
 
-| Object | Is |
+If the cursor is not in an object of that type, the editor uses the next one.
+A count selects an object that is farther out.
+
+| Keys | Result |
 |---|---|
-| `f` | Function (from the syntax tree) |
+| `daf` | Deletes the function |
+| `ci"` | Changes the text between the quotes |
+| `vic` | Selects the body of the class |
+| `yia` | Copies the argument at the cursor |
+| `dab` | Deletes the brackets and their contents |
+| `cit` | Changes the contents of the HTML tag |
+| `yig` | Copies the file, without the blank lines at its start and its end |
+| `dih` | Deletes the Git hunk |
+| `2dib` | Deletes the contents of the second pair of brackets around the cursor |
+
+These are the objects:
+
+| Object | Meaning |
+|---|---|
+| `f` | Function, from the syntax tree |
 | `c` | Class |
 | `o` | Block, conditional or loop |
-| `u` / `U` | Function call (`U` also for `obj.method(...)`) |
+| `u` / `U` | Function call. `U` also matches `obj.method(...)` |
 | `a` | Argument |
-| `b` | Any bracket: `()`, `[]`, `{}` |
-| `q` | Any quote |
-| `t` | HTML/XML tag |
+| `b` | A bracket of each type: `()`, `[]`, `{}` |
+| `q` | A quote of each type |
+| `t` | HTML or XML tag |
 | `d` | Number |
-| `g` | Whole file (`ig` skips blank lines at both ends) |
+| `g` | The full file. `ig` omits the blank lines at the two ends |
 | `h` | Git hunk (`dih`, `vih`) |
 
-Built-ins such as `iw`, `ip`, `i(` and `it` work as always.
+The built-in objects, for example `iw`, `ip`, `i(` and `it`, continue to work.
 
-| Keys | Moves to |
+| Keys | Destination |
 |---|---|
-| `]f` / `[f` | Next / previous function start (`]F` / `[F`: end) |
-| `]c` / `[c` | Next / previous class start (`]C` / `[C`: end). In diff mode: next / previous change |
-| `]h` / `[h` | Next / previous Git hunk (`]H` / `[H`: last / first) |
+| `]f` / `[f` | The start of the next / previous function. `]F` / `[F` go to the end |
+| `]c` / `[c` | The start of the next / previous class. `]C` / `[C` go to the end. In diff mode: the next / previous change |
+| `]h` / `[h` | The next / previous Git hunk. `]H` / `[H` go to the last / first hunk |
 
-The function or class around the cursor stays pinned at the top of the window
-while you scroll (`Space u t` toggles it). Folds follow the syntax tree and
-start open: `za` toggles one, `zM` closes all, `zR` opens all.
+While you scroll, the function or class around the cursor stays at the top of
+the window. `Space u t` toggles this context.
+
+Folds use the syntax tree, and all folds are open when you open a file. `za`
+toggles one fold, `zM` closes all folds, and `zR` opens all folds.
 
 ## Surround and pairs
 
-Under `gs`, so the built-in `s` keeps working. The last key is the
-surrounding: `)`, `]`, `}`, `"`, `'`, `` ` ``, `t` for a tag (asks for the
-name), `f` for a function call (asks for the name).
+The surround keys start with `gs`. Thus the built-in `s` key continues to
+work.
 
-| Keys | Does | Example |
+The last key is the surrounding character: `)`, `]`, `}`, `"`, `'` or `` ` ``.
+Two letters have a special meaning. `t` is a tag and `f` is a function call,
+and for these two the editor asks for the name.
+
+| Keys | Action |
+|---|---|
+| `gsa{motion}{char}` | Add a surrounding. In visual mode, use `gsa{char}` |
+| `gsd{char}` | Delete a surrounding |
+| `gsr{old}{new}` | Replace a surrounding |
+| `gsf` / `gsF` | Find the next / previous surrounding |
+| `gsh` | Highlight the surrounding for a short time |
+
+Examples:
+
+| Text before | Keys | Text after |
 |---|---|---|
-| `gsa{motion}{char}` | Add | `gsaiw"` quotes a word; in visual mode `gsa"` |
-| `gsd{char}` | Delete | `gsd)` removes the parentheses around the cursor |
-| `gsr{old}{new}` | Replace | `gsr"'` turns double quotes into single |
-| `gsf` / `gsF` | Find the next / previous surrounding | |
-| `gsh` | Highlight it briefly | |
+| `hello` | `gsaiw"` | `"hello"` |
+| `(a + b)` | `gsd)` | `a + b` |
+| `"name"` | `gsr"'` | `'name'` |
+| `value` | `gsaiwf`, then `str` and `Enter` | `str(value)` |
+| `title` | `gsaiwt`, then `h1` and `Enter` | `<h1>title</h1>` |
 
-Opening brackets and quotes close themselves as you type; `Space u p` turns
-that off.
+When you type an opening bracket or quote, the editor adds the closing one.
+`Space u p` stops this.
 
 ## Git
 
-Changed lines are marked in the sign column: a bar for added and changed, a
-low line where lines were deleted. Staged changes are marked too, in a paler colour.
+The sign column shows the changed lines. A bar shows a line that you added or
+changed. A low line shows the position of deleted lines. Staged changes have
+the same signs in a paler colour.
 
-| Keys | Does |
+| Keys | Action |
 |---|---|
-| `Space g g` | lazygit in a floating window. `e` on a file opens it in this Neovim; `q` returns |
+| `Space g g` | Open lazygit in a floating window. `e` on a file opens it in this Neovim, and `q` goes back |
 | `Space g s` | Changed files (picker) |
-| `Space g d` | Changed hunks across the project (picker) |
-| `Space g l` / `g f` | Log / history of this file |
-| `Space g b` | Commits that touched the current line |
-| `Space g B` | Open the file (or the selected lines) on GitHub |
+| `Space g d` | Changed hunks in the project (picker) |
+| `Space g l` / `g f` | The log / the history of this file |
+| `Space g b` | The commits that changed the current line |
+| `Space g B` | Open the file, or the selected lines, on GitHub |
 | `Space g Y` | Copy that link |
-| `Space g h s` | Stage the hunk (or the selected lines). On a staged hunk: unstage it |
-| `Space g h r` | Reset the hunk to the index (discards the change) |
-| `Space g h S` / `h R` | Stage / reset the whole file |
-| `Space g h p` | Preview the hunk inline |
-| `Space g h b` | Blame the line, with the full commit message |
-| `Space g h B` | Blame the whole file in a side window |
-| `Space g h d` / `h D` | Diff against the index / the last commit |
+| `Space g h s` | Stage the hunk, or the selected lines. On a staged hunk, it unstages the hunk |
+| `Space g h r` | Reset the hunk to the index |
+| `Space g h S` / `h R` | Stage / reset the full file |
+| `Space g h p` | Show the hunk in the buffer |
+| `Space g h b` | Show the blame for the line, with the full commit message |
+| `Space g h B` | Show the blame for the full file in a side window |
+| `Space g h d` / `h D` | Diff against the index / against the last commit |
 | `Space u G` | Toggle the Git signs |
 
-Reviewing a large diff and resolving conflicts are still done in lazygit and
-`ec` ([git.md](git.md)).
+Caution: `Space g h r` and `Space g h R` discard your changes.
+
+Use lazygit and `ec` to read a large diff and to solve conflicts. See
+[git.md](git.md).
+
+### Example: commit one hunk of a file
+
+1. Press `]h` to go to the next hunk.
+2. Press `Space g h p` to see the old lines and the new lines.
+3. Press `Space g h s` to stage the hunk.
+4. Press `Space g g` to open lazygit.
+5. Press `c`, type the commit message, and press `Enter`.
+6. Press `q` to go back to Neovim.
 
 ## Terminal
 
-`Ctrl-/` opens a terminal at the bottom and hides it again, from normal and
-terminal mode alike; the shell keeps running while hidden. `Space f t` does
-the same. Inside, `Esc Esc` switches to normal mode for scrolling and
-copying; `i` goes back.
+`Ctrl-/` opens a terminal at the bottom of the window. The same key hides it.
+The key works in normal mode and in terminal mode. The shell continues to run
+while the terminal is hidden. `Space f t` does the same.
+
+In the terminal, press `Esc Esc` to go to normal mode. There you can scroll
+and copy text. Press `i` to go back.
+
+Example: run a long command and continue to edit.
+
+1. Press `Ctrl-/` and run `uv run pytest`.
+2. Press `Ctrl-/` to hide the terminal, and continue to edit.
+3. Press `Ctrl-/` again to read the result.
 
 ## Sessions
 
-When Neovim exits, the open files and windows for the current directory are
-saved. The dashboard's `s`, or `Space q s`, brings them back.
+When Neovim exits, it saves the open files and the windows for the current
+directory. To restore them, press `s` on the dashboard or `Space q s`.
 
-| Keys | Does |
+| Keys | Action |
 |---|---|
-| `Space q s` | Restore this directory's session |
-| `Space q l` | Restore the last session, wherever it was |
-| `Space q S` | Pick a session |
-| `Space q d` | Don't save the session when quitting this time |
+| `Space q s` | Restore the session of this directory |
+| `Space q l` | Restore the last session, from any directory |
+| `Space q S` | Select a session |
+| `Space q d` | Do not save the session when you quit this time |
+
+Example: continue the work of the previous day.
+
+```bash
+cd ~/github/myapp
+nvim
+```
+
+The dashboard opens. Press `s`, and Neovim opens the same files in the same
+windows.
 
 ## Code intelligence
 
-A language server starts by itself when a file of its language opens. Built
-into the editor for any directory: Nix (nixd, which knows this repository's
-nix-darwin and Home Manager options), Lua, shell (sh and bash, with
-shellcheck), Markdown, JSON, YAML and TOML. Python, Java, web, Go, Rust, C/C++,
-Ruby, PHP, Elixir, Terraform and SQL have their own sections below; several of
-them need the project's dev shell. `Space c l` lists the servers running for
-the current file.
+A language server starts automatically when you open a file of its language.
 
-| Keys | Does |
+The editor contains the servers for these languages, and they work in each
+directory: Nix, Lua, shell (sh and bash, with shellcheck), Markdown, JSON, YAML
+and TOML. The Nix server is nixd, and it knows the nix-darwin options and the
+Home Manager options of this repository.
+
+Python, Java, web, Go, Rust, C/C++, Ruby, PHP, Elixir, Terraform and SQL have
+their own sections below. For some of them, the dev shell of the project is
+necessary.
+
+`Space c l` shows the servers that run for the current file.
+
+| Keys | Action |
 |---|---|
-| `K` | Documentation for the symbol (press again to enter the window) |
-| `gd` | Go to definition (`Ctrl-o` comes back) |
-| `gD` | Go to declaration |
-| `grr` | References |
-| `gri` / `grt` | Implementation / type definition |
-| `gai` / `gao` | Incoming / outgoing calls |
-| `gK` | Signature help (also shown automatically while typing arguments) |
-| `]]` / `[[` | Next / previous use of the symbol under the cursor |
-| `grn` or `Space c r` | Rename the symbol everywhere |
+| `K` | Show the documentation of the symbol. Press `K` again to go into the window |
+| `gd` | Go to the definition. `Ctrl-o` goes back |
+| `gD` | Go to the declaration |
+| `grr` | Show the references |
+| `gri` / `grt` | Go to the implementation / the type definition |
+| `gai` / `gao` | Show the incoming / outgoing calls |
+| `gK` | Show the signature help. The editor also shows it while you type arguments |
+| `]]` / `[[` | Go to the next / previous use of the symbol at the cursor |
+| `grn` or `Space c r` | Rename the symbol in all files |
 | `gra` or `Space c a` | Code action (quick fix) |
-| `Space c A` | Source action (organise imports and the like) |
-| `Space c R` | Rename the file, updating imports where the server supports it |
+| `Space c A` | Source action, for example organise imports |
+| `Space c R` | Rename the file. Where the server supports it, the server updates the imports |
 | `Space s s` / `s S` | Symbols in this file / in the project |
 | `gO` | Outline of this file |
 
-Other uses of the symbol under the cursor are highlighted after a moment.
+After a short time, the editor highlights the other uses of the symbol at the
+cursor.
+
+### Example: read about a function and go to its source
+
+1. Put the cursor on the name of the function.
+2. Press `K` to read its documentation.
+3. Press `gd` to go to its definition.
+4. Press `Ctrl-o` to go back.
+
+### Example: rename a function in all files
+
+1. Put the cursor on the name of the function.
+2. Press `grr` to see all references in the quickfix list. Press `q` in that
+   list to close it.
+3. Press `grn`, type the new name, and press `Enter`.
+4. Run `:wa` to save all changed files.
 
 ## Diagnostics
 
-Errors and warnings appear at the end of the line and as icons in the sign
+Errors and warnings show at the end of the line and as icons in the sign
 column.
 
-| Keys | Does |
+| Keys | Action |
 |---|---|
-| `Space c d` | Full message for the current line |
-| `]d` / `[d` | Next / previous diagnostic |
-| `]e` / `[e` | Next / previous error |
-| `]w` / `[w` | Next / previous warning |
-| `Space s d` / `s D` | Diagnostics in this file / the project (picker) |
+| `Space c d` | Show the full message for the current line |
+| `]d` / `[d` | Go to the next / previous diagnostic |
+| `]e` / `[e` | Go to the next / previous error |
+| `]w` / `[w` | Go to the next / previous warning |
+| `Space s d` / `s D` | Diagnostics in this file / in the project (picker) |
 | `Space x x` | Diagnostics (picker) |
-| `Space u d` | Hide or show diagnostics |
-| `Space u h` | Inlay hints (types and parameter names inline, where supported) |
+| `Space u d` | Hide or show the diagnostics |
+| `Space u h` | Inlay hints: types and parameter names in the line, where the server supports them |
+
+Example: correct the next error.
+
+1. Press `]e` to go to the next error.
+2. Press `Space c d` to read the full message.
+3. Press `Space c a` and select a correction, if the server offers one.
 
 ## Completion
 
-The menu opens as you type, with the first item selected.
+The menu opens while you type, and the first item is selected.
 
-| Keys | Does |
+| Keys | Action |
 |---|---|
 | `Enter` | Accept the selected item |
-| `Tab` / `Shift-Tab`, `Ctrl-n` / `Ctrl-p`, arrows | Next / previous item |
-| `Ctrl-Space` | Open the menu, or toggle the documentation beside it |
+| `Tab` / `Shift-Tab`, `Ctrl-n` / `Ctrl-p`, or the arrow keys | Go to the next / previous item |
+| `Ctrl-Space` | Open the menu, or show and hide the documentation next to it |
 | `Ctrl-e` | Close the menu |
 | `Ctrl-b` / `Ctrl-f` | Scroll the documentation |
-| `Tab` / `Shift-Tab` in a snippet | Jump to the next / previous placeholder |
+| `Tab` / `Shift-Tab` in a snippet | Go to the next / previous placeholder |
 
-Items come from the language server, file paths (type `./` or `~/`),
-snippets and words in open buffers.
+The items come from four sources: the language server, file paths, snippets,
+and the words in the open buffers. To get file paths, type `./` or `~/`.
 
 ## Formatting
 
-`Space c f` formats the file, or the selection, at any time.
+`Space c f` formats the file or the selection. It works at all times.
 
-Format on save is **off unless the project asks for it**, so opening and
-saving an existing file never rewrites code you did not touch. It turns on by
-itself in a project that has a formatter configuration: `stylua.toml`, a
-prettier config, `biome.json` (or `.biome.json`), `ruff.toml`, `rustfmt.toml`, `.clang-format`,
-`treefmt.toml`, `rumdl.toml` or `tombi.toml`, or a `[tool.ruff]` or
-`[tool.rumdl]` section in `pyproject.toml`, or `.rubocop.yml`,
-`.standard.yml`, `pint.json`, `.php-cs-fixer.php`, `.formatter.exs` or
-`.sql-formatter.json`. Go and Rust files also turn it on in a project with a
-`go.mod` or `Cargo.toml` (other files there are left alone), and Terraform
-files always do.
+### Format on save
 
-| Keys | Does |
+Format on save is off unless the project asks for it. Thus a save of an old
+file does not change code that you did not edit.
+
+Format on save becomes on automatically in a project that has a configuration
+file for a formatter:
+
+| Formatter | File in the project |
 |---|---|
-| `Space u f` | Format on save for every buffer, this session |
-| `Space u F` | Format on save for this buffer only (wins over `Space u f`) |
+| stylua | `stylua.toml` |
+| prettier | A prettier configuration file |
+| biome | `biome.json` or `.biome.json` |
+| ruff | `ruff.toml`, or a `[tool.ruff]` section in `pyproject.toml` |
+| rustfmt | `rustfmt.toml` |
+| clang-format | `.clang-format` |
+| treefmt | `treefmt.toml` |
+| rumdl | `rumdl.toml`, or a `[tool.rumdl]` section in `pyproject.toml` |
+| tombi | `tombi.toml` |
+| rubocop, standard | `.rubocop.yml`, `.standard.yml` |
+| pint, php-cs-fixer | `pint.json`, `.php-cs-fixer.php` |
+| mix format | `.formatter.exs` |
+| sql-formatter | `.sql-formatter.json` |
 
-To turn it on or off permanently for one project, put a `.nvim.lua` in the
-project root:
+Three languages have their own rule:
+
+- Go files format on save in a project with a `go.mod`.
+- Rust files format on save in a project with a `Cargo.toml`.
+- Terraform files always format on save.
+
+In a Go project or a Rust project, the other files stay as they are.
+
+You can change the setting with two toggles:
+
+| Keys | Action |
+|---|---|
+| `Space u f` | Format on save for all buffers, for this session |
+| `Space u F` | Format on save for this buffer only. It has priority over `Space u f` |
+
+To set format on save permanently for one project, put a `.nvim.lua` file in
+the project root:
 
 ```lua
 vim.g.autoformat = true   -- or false
 ```
 
-The first time Neovim finds that file it asks whether to trust it (`a` to
-allow); it asks again whenever the file changes.
+The first time that Neovim finds that file, it asks if you trust it. Press `a`
+to allow it. Neovim asks again after each change to the file.
 
-Formatters: nixfmt for Nix, stylua for Lua, shfmt for shell, rumdl for
-Markdown. For JavaScript, TypeScript, Vue, CSS, HTML and JSON: biome where
-the project has a `biome.json`, else prettier (prettierd) where it configures
-prettier, else the language server. YAML, SCSS and Less: prettier where
-configured, else the language server.
+The editor uses the first of these settings that exists:
+
+1. The setting of the buffer (`Space u F`)
+2. The global setting (`Space u f`, or a trusted `.nvim.lua`)
+3. The configuration files of the project
+
+To see the result for the current buffer, run this command. It prints `true`
+or `false`:
+
+```vim
+:lua print(_G.workstation_autoformat(0))
+```
+
+### The formatter for each language
+
+| Language | Formatter |
+|---|---|
+| Nix | nixfmt |
+| Lua | stylua |
+| Shell | shfmt |
+| Markdown | rumdl |
+| JavaScript, TypeScript, Vue, CSS, HTML, JSON | biome if the project has a `biome.json`. If not, prettier (prettierd) if the project configures prettier. If not, the language server |
+| YAML, SCSS, Less | prettier if the project configures it. If not, the language server |
 
 ## Markdown
 
-Headings, lists, tables, code blocks and links are drawn formatted while you
-read; the line under the cursor and insert mode show the plain text. Images
-appear inline (Ghostty draws them). `Space u m` switches the rendering off.
+The editor shows headings, lists, tables, code blocks and links with their
+format while you read. The line at the cursor shows the plain text, and insert
+mode shows the plain text for all lines.
 
-| Keys | Does |
+Images show in the buffer, because Ghostty can draw them. `Space u m` stops
+the rendering.
+
+| Keys | Action |
 |---|---|
-| `gd` on a link | Follow it to the file or heading |
-| `Space s s` | Headings of this file |
-| `Space c p` | Open the file in Typora (for Mermaid diagrams and a print view) |
+| `gd` on a link | Go to the file or the heading |
+| `Space s s` | Show the headings of this file |
+| `Space c p` | Open the file in Typora, for Mermaid diagrams and a print view |
 
-rumdl checks Markdown style; the line-length rule is off unless a project's
-own rumdl or markdownlint configuration turns it on. Mermaid diagrams, LaTeX
-math and PDFs are not rendered in Neovim.
+rumdl examines the Markdown style. Its line-length rule is off, unless the
+rumdl or markdownlint configuration of a project sets it to on.
+
+Neovim does not render Mermaid diagrams, LaTeX formulas or PDF files.
 
 ## Python
 
-ty (types, navigation, hover) and ruff (lint, quick fixes, import sorting,
-formatting) start with any `.py` file and use the project's uv `.venv`
-by themselves. Open Neovim from the project directory.
+Two servers start with each `.py` file. ty gives types, navigation and hover
+text. ruff gives lint results, quick fixes, import sort and formatting. The
+two servers find the uv `.venv` of the project automatically.
 
-The project provides the rest, as dev dependencies:
+Open Neovim from the project directory.
+
+The project supplies the other tools as development dependencies:
 
 ```bash
 uv add --dev pytest          # tests
-uv add --dev debugpy         # optional: the debugger adds it for the session if missing
+uv add --dev debugpy         # optional: the debugger adds it for the session if it is not there
 ```
 
-Keep the project's configuration, including ruff's, in `pyproject.toml`
-(example in [projects.md](projects.md#python)). A `[tool.ruff]` section
-there turns format on save on for the project. `Space c f` runs ruff's import
-sorting and formatter.
+Keep the configuration of the project, with the ruff settings, in
+`pyproject.toml`. [projects.md](projects.md#python) has an example. A
+`[tool.ruff]` section in that file sets format on save to on for the project.
+
+`Space c f` runs the import sort and the formatter of ruff.
+
+### Example: debug one test
+
+1. Open the test file and put the cursor on a line in the test.
+2. Press `Space d b` to set a breakpoint.
+3. Press `Space t d`. The test starts and stops at the breakpoint.
+4. Press `Space d O` to step over a line, or `Space d i` to step into a call.
+5. Put the cursor on a variable and press `Space d e` to see its value.
+6. Press `Space d c` to continue, or `Space d t` to stop.
 
 ## Java and Spring
 
-jdtls (the Eclipse Java language server) starts with any `.java` file in a
-Maven or Gradle project. The project's own JDK comes from its dev shell
-(`JAVA_HOME`, [projects.md](projects.md#java--spring)), so open Neovim from
-the project directory. The first start imports the project, which takes a
-while for a large one; the progress shows at the bottom right.
+jdtls is the Eclipse Java language server. It starts with each `.java` file in
+a Maven project or a Gradle project.
 
-Everything from [Code intelligence](#code-intelligence) works, plus:
+The JDK of the project comes from its dev shell, through `JAVA_HOME`. See
+[projects.md](projects.md#java--spring). Thus you must open Neovim from the
+project directory.
 
-| Keys | Does |
+The first start imports the project. For a large project this takes some time,
+and the progress shows at the bottom right.
+
+All keys from [Code intelligence](#code-intelligence) work. Java adds these
+keys:
+
+| Keys | Action |
 |---|---|
-| `gd` on a library class | Opens its source, or decompiled code where there is none |
-| `gai` / `gao` | Call hierarchy (who calls this / what this calls) |
+| `gd` on a library class | Open its source. If there is no source, open the decompiled code |
+| `gai` / `gao` | Call hierarchy: the callers of this method / the calls of this method |
 | `Space c o` | Organise imports |
-| `Space c x v` | Extract variable (all occurrences; works on a selection) |
-| `Space c x c` | Extract constant |
-| `Space c x m` (visual) | Extract method |
-| `Space c s` | Go to the method this one overrides |
-| `Space c a` | Code actions: generate getters, constructors, `toString`, implement methods, … |
+| `Space c x v` | Extract a variable, for all occurrences. It also works on a selection |
+| `Space c x c` | Extract a constant |
+| `Space c x m` (visual mode) | Extract a method |
+| `Space c s` | Go to the method that this method overrides |
+| `Space c a` | Code actions: generate getters, constructors and `toString`, implement methods, and others |
 
-Lombok works out of the box: generated getters, setters and builders are
-known to completion and navigation.
+Lombok works with no configuration. Completion and navigation know the
+generated getters, setters and builders.
 
-**Tests** run through jdtls (JUnit 4, 5 and 6), not neotest:
+### Tests
 
-| Keys | Does |
+Java tests run through jdtls (JUnit 4, 5 and 6), not through neotest.
+
+| Keys | Action |
 |---|---|
-| `Space t r` | Run the test method under the cursor |
-| `Space t t` | Run the whole test class |
-| `Space t d` / `t D` | Debug the method / the class (stops at breakpoints) |
-| `Space t p` | Pick a test from the file |
+| `Space t r` | Run the test method at the cursor |
+| `Space t t` | Run the full test class |
+| `Space t d` / `t D` | Debug the method / the class. The run stops at breakpoints |
+| `Space t p` | Select a test from the file |
 
-Failures land in the quickfix list (`Space x q`), one line per failed test.
+Failed tests go to the quickfix list, with one line for each failed test. Open
+the list with `Space x q`.
 
-**Debugging an application**: set a breakpoint, `Space d c`, and pick the
-main class; jdtls finds them. The rest of [Debugging](#debugging-space-d-and-the-f-keys)
-applies, including the IntelliJ F-keys.
+### Debug an application
 
-**Spring Boot**: in `application.properties` and `application.yml`, property
-names complete and are validated, `K` documents them, and `gd` on
-`@Value("${…}")` jumps to the property. In Java code, beans and request
-mappings are recognised (`Space s s` lists them among the symbols).
+1. Set a breakpoint with `Space d b`.
+2. Press `Space d c`.
+3. Select the main class. jdtls finds the main classes of the project.
+
+All other keys from [Debugging](#debugging-space-d-and-the-f-keys) apply, with
+the IntelliJ F-keys.
+
+### Spring Boot
+
+In `application.properties` and `application.yml`, the editor completes and
+validates the property names. `K` shows the documentation of a property.
+
+`gd` on `@Value("${...}")` goes to the property.
+
+In Java code, the editor knows the beans and the request mappings. `Space s s`
+shows them in the symbol list.
 
 ## Web: TypeScript, JavaScript, Vue, HTML, CSS, Docker
 
-Open Neovim from the project directory, inside its dev shell
-([projects.md](projects.md#javascript--typescript--vue--react)), so the
-project's Node and `node_modules` are found.
+Open Neovim from the project directory, in its dev shell. See
+[projects.md](projects.md#javascript--typescript--vue--react). The editor then
+finds the Node and the `node_modules` of the project.
 
 | Server | Starts for | Notes |
 |---|---|---|
-| vtsls | `.ts`, `.tsx`, `.js`, `.jsx`, `.vue` | Uses the project's `node_modules/typescript`, else its own |
-| vue_ls | `.vue` | Templates and styles; script blocks go through vtsls |
-| eslint | JS, TS, Vue | Only with an eslint config file; the eslint version is the project's |
-| biome | JS, TS, JSON, CSS, HTML, Vue | Only with a `biome.json` |
-| tailwindcss | HTML, CSS, JS/TS, Vue, Markdown, … | Only where `package.json` lists `tailwindcss` or there is a `tailwind.config.*` |
-| html, cssls | `.html`, `.css`/`.scss`/`.less` | |
-| emmet | HTML, CSS, JSX/TSX, Vue | Abbreviations such as `ul>li*3` appear in completion |
-| docker-language-server | `Dockerfile`, `compose.yaml`, `docker-compose.yml`, Bake files | yamlls still validates Compose files against their schema |
+| vtsls | `.ts`, `.tsx`, `.js`, `.jsx`, `.vue` | Uses `node_modules/typescript` of the project. If that is absent, it uses its own TypeScript |
+| vue_ls | `.vue` | Templates and styles. The script blocks go through vtsls |
+| eslint | JavaScript, TypeScript, Vue | Only with an eslint configuration file. The eslint version is that of the project |
+| biome | JavaScript, TypeScript, JSON, CSS, HTML, Vue | Only with a `biome.json` |
+| tailwindcss | HTML, CSS, JavaScript, TypeScript, Vue, Markdown and others | Only if `package.json` contains `tailwindcss`, or the project has a `tailwind.config.*` file |
+| html, cssls | `.html`, `.css`, `.scss`, `.less` | |
+| emmet | HTML, CSS, JSX, TSX, Vue | Completion shows abbreviations, for example `ul>li*3` |
+| docker-language-server | `Dockerfile`, `compose.yaml`, `docker-compose.yml`, Bake files | yamlls continues to validate Compose files against their schema |
 
-Everything from [Code intelligence](#code-intelligence) works. `Space c A`
-offers source actions: organise, sort or remove unused imports, add missing
-imports, fix all fixable TypeScript issues, and "Fix all fixable ESLint
-issues" (`:LspEslintFixAll` does that directly). Type hints for parameters
-and return types show with `Space u h`. Renaming a file with `Space c R` does
-**not** update imports here: vtsls does not offer it to Neovim.
+All keys from [Code intelligence](#code-intelligence) work.
 
-There is no JavaScript test runner or debugger in the editor yet.
+`Space c A` offers these source actions:
+
+- Organise the imports
+- Sort the imports
+- Remove the imports that are not used
+- Add the missing imports
+- Correct all TypeScript problems that have an automatic correction
+- "Fix all fixable ESLint issues". `:LspEslintFixAll` does this directly
+
+`Space u h` shows type hints for parameters and return types.
+
+Note: in a web project, `Space c R` renames the file but does not update the
+imports. vtsls does not offer that function to Neovim.
+
+The editor has no JavaScript test runner and no JavaScript debugger.
+
+Example: use an emmet abbreviation. In an HTML file, type `ul>li*3` and accept
+the emmet item in the completion menu. The result is:
+
+```html
+<ul>
+  <li></li>
+  <li></li>
+  <li></li>
+</ul>
+```
 
 ## Go
 
-gopls starts with any `.go` file. The Go toolchain comes from the project's
-dev shell ([projects.md](projects.md#go)), so open Neovim from the project
-directory. Saving formats with plain gofmt (not gofumpt), because `go.mod`
-counts as the project asking for it. `Space c A` offers "Organize Imports".
+gopls starts with each `.go` file. The Go toolchain comes from the dev shell of
+the project. See [projects.md](projects.md#go). Thus you must open Neovim from
+the project directory.
 
-golangci-lint's findings appear only where the project has a
-`.golangci.yml` (or `.yaml`, `.toml`, `.json`) and golangci-lint in its dev
-shell.
+A save formats the file with plain gofmt, not with gofumpt. The `go.mod` file
+sets format on save to on. `Space c A` offers "Organize Imports".
 
-Tests use the keys in [Tests](#tests-space-t); `Space t d` debugs one with
+The results of golangci-lint show only when two conditions are true:
+
+- The project has a `.golangci.yml` file (or `.yaml`, `.toml`, `.json`).
+- The dev shell of the project contains golangci-lint.
+
+Tests use the keys in [Tests](#tests-space-t). `Space t d` debugs one test with
 delve. `Space d c` offers to debug the package, the file or a test.
 
 ## Rust
 
-rustaceanvim starts rust-analyzer with any `.rs` file in a Cargo project.
-rust-analyzer, rustfmt, clippy and cargo come from the project's dev shell
-([projects.md](projects.md#rust)) so they match its compiler; open Neovim
-from the project directory. Saving formats with rustfmt (`Cargo.toml` counts
-as the project asking for it), and clippy's warnings appear after each save.
+rustaceanvim starts rust-analyzer with each `.rs` file in a Cargo project.
 
-| Keys | Does |
+rust-analyzer, rustfmt, clippy and cargo come from the dev shell of the
+project, because they must match its compiler. See
+[projects.md](projects.md#rust). Open Neovim from the project directory.
+
+A save formats the file with rustfmt, because `Cargo.toml` sets format on save
+to on. The warnings of clippy show after each save.
+
+| Keys | Action |
 |---|---|
-| `Space c a` | Code actions, including rust-analyzer's assists |
-| `:RustLsp expandMacro` | Show what the macro under the cursor expands to |
-| `:RustLsp explainError` | Explain the error under the cursor |
-| `:RustLsp runnables` / `debuggables` | Pick something to run or debug |
+| `Space c a` | Code actions, with the assists of rust-analyzer |
+| `:RustLsp expandMacro` | Show the expansion of the macro at the cursor |
+| `:RustLsp explainError` | Explain the error at the cursor |
+| `:RustLsp runnables` / `debuggables` | Select an item to run / to debug |
 
-In `Cargo.toml`, crates.nvim shows each dependency's latest version and
-completes crate names, versions and features; it asks crates.io, so it needs
-the network.
+In `Cargo.toml`, crates.nvim shows the latest version of each dependency. It
+also completes crate names, versions and features. It gets the data from
+crates.io, thus a network connection is necessary.
 
-Tests use the keys in [Tests](#tests-space-t) (cargo test, or cargo-nextest
-when installed); `Space t d` debugs one.
+Tests use the keys in [Tests](#tests-space-t). They run with cargo test, or
+with cargo-nextest if it is installed. `Space t d` debugs one test.
 
 ## C and C++
 
-clangd starts with C and C++ files. It needs the project's build flags in a
-`compile_commands.json` at the project root (CMake:
-`-DCMAKE_EXPORT_COMPILE_COMMANDS=ON`; Make: run the build under `bear`);
-without one it guesses. It asks Apple's clang for the SDK headers.
+clangd starts with C files and C++ files. The build flags of the project must
+be in a `compile_commands.json` file in the project root. Without that file,
+clangd estimates the flags.
 
-| Keys | Does |
+| Build system | How to get `compile_commands.json` |
 |---|---|
-| `Space c h` | Switch between the source file and its header |
+| CMake | Configure with `-DCMAKE_EXPORT_COMPILE_COMMANDS=ON` |
+| Make | Run the build with `bear`, for example `bear -- make` |
 
-Formatting uses the project's `.clang-format`, which also turns format on
-save on. clang-tidy's checks appear where the project has a `.clang-tidy`.
+clangd asks Apple clang for the SDK headers.
 
-To debug, build with `-g`, set a breakpoint and `Space d c`: "Launch" asks for
-the program and its arguments, "Attach to process" picks a running one.
+| Keys | Action |
+|---|---|
+| `Space c h` | Go between the source file and its header |
+
+The formatter uses the `.clang-format` file of the project. That file also
+sets format on save to on. The checks of clang-tidy show if the project has a
+`.clang-tidy` file.
+
+To debug a program, do these steps:
+
+1. Build the program with `-g`.
+2. Set a breakpoint with `Space d b`.
+3. Press `Space d c`.
+4. Select "Launch" to start the program. The editor asks for the program and
+   its arguments. Or select "Attach to process" to use a program that runs.
 
 ## Ruby
 
-ruby-lsp starts with `.rb` and `.erb` files. It and rubocop (or standard)
-come from the project's `Gemfile` ([projects.md](projects.md#ruby-rails-sinatra-padrino)),
-so they run under the project's Ruby; open Neovim from the project
-directory. rubocop's offences appear as diagnostics, and a `.rubocop.yml` or
-`.standard.yml` turns format on save on. In a large project, hover and `gd`
-work once indexing has finished (the progress shows at the bottom right).
+ruby-lsp starts with `.rb` files and `.erb` files. ruby-lsp and rubocop (or
+standard) come from the `Gemfile` of the project. Thus they run with the Ruby
+of the project. See [projects.md](projects.md#ruby-rails-sinatra-padrino).
+
+Open Neovim from the project directory.
+
+The offences that rubocop finds show as diagnostics. A `.rubocop.yml` file or a
+`.standard.yml` file sets format on save to on.
+
+In a large project, hover and `gd` work after the server completes its index.
+The progress shows at the bottom right.
 
 ## PHP
 
-phpactor starts with `.php` files in a project with `composer.json` or Git.
-It works without `vendor/`, but then reports every framework class as
-missing: run `composer install` first. Formatting uses the project's
-`vendor/bin/pint` if installed, else `vendor/bin/php-cs-fixer`; `pint.json`
-or a `.php-cs-fixer.php` turns format on save on.
+phpactor starts with `.php` files in a project that has a `composer.json` file
+or a Git repository.
+
+phpactor works without `vendor/`, but then it reports each framework class as
+missing. Run `composer install` first.
+
+The formatter is `vendor/bin/pint` of the project, if it is installed. If not,
+the formatter is `vendor/bin/php-cs-fixer`. A `pint.json` file or a
+`.php-cs-fixer.php` file sets format on save to on.
 
 ## Elixir and Phoenix
 
 Expert starts with `.ex`, `.exs` and `.heex` files. The first start in a
-project builds its engine, which takes a while. Formatting is `mix format`
-following the project's `.formatter.exs`, which also turns format on save
-on.
+project builds the engine of Expert. This takes some time.
 
-Expert looks for the project's Erlang through a fresh login shell, not
-through Neovim's environment, and otherwise falls back to the Elixir bundled
-with it. If a project pins a different Elixir, that difference can matter.
+The formatter is `mix format`. It obeys the `.formatter.exs` file of the
+project, and that file also sets format on save to on.
+
+Expert looks for the Erlang of the project in a new login shell. It does not
+use the environment of Neovim. If it finds no Erlang, it uses the Elixir that
+comes with Expert. If a project pins a different Elixir version, this
+difference can change the results.
 
 ## Terraform
 
-terraform-ls starts with `.tf` and `.tfvars` files. The terraform CLI comes
-from the project's dev shell ([projects.md](projects.md#terraform)), and
-saving formats with `terraform fmt`, on by default for Terraform files.
-tflint's findings appear where the project has a `.tflint.hcl` and tflint in
-its dev shell.
+terraform-ls starts with `.tf` files and `.tfvars` files. The terraform CLI
+comes from the dev shell of the project. See
+[projects.md](projects.md#terraform).
+
+A save formats the file with `terraform fmt`. Format on save is on by default
+for Terraform files.
+
+The results of tflint show if the project has a `.tflint.hcl` file and tflint
+in its dev shell.
 
 ## SQL and databases
 
-In a project with a `postgres-language-server.jsonc`, the Postgres language
-server checks SQL syntax (and, with a reachable database, names). A
-`.sql-formatter.json` sets sql-formatter's style and turns format on save on;
-`Space c f` formats with sql-formatter's defaults anywhere.
+In a project with a `postgres-language-server.jsonc` file, the Postgres
+language server examines the SQL syntax. If it can connect to a database, it
+also examines the names.
 
-`Space D` opens the database browser (vim-dadbod-ui). Add a connection with
-`A` in it, as a URL such as `postgresql://user@localhost/db` or
-`sqlite:path/to.db`; saved connections live in Neovim's data directory
-(`~/.local/share/nvim/db_ui`), never in a repository. A URL with a password
-in it is stored in plain text there, so prefer `~/.pgpass` or an environment
-variable. In a query buffer, table and column names complete from the
-connection. `:DB <url> <query>` runs one query directly.
+A `.sql-formatter.json` file sets the style of sql-formatter and sets format on
+save to on. Without that file, `Space c f` formats with the defaults of
+sql-formatter.
+
+`Space D` opens the database browser (vim-dadbod-ui).
+
+1. Press `A` in the browser to add a connection.
+2. Type the connection as a URL, for example `postgresql://user@localhost/db`
+   or `sqlite:path/to.db`.
+
+The editor keeps the saved connections in the data directory of Neovim
+(`~/.local/share/nvim/db_ui`). They do not go into a repository.
+
+Caution: a URL with a password is plain text in that directory. Use
+`~/.pgpass` or an environment variable for the password.
+
+In a query buffer, the editor completes table names and column names from the
+connection. To run one query directly, use `:DB`:
+
+```vim
+:DB postgresql://user@localhost/db select count(*) from users
+```
 
 ## Tests: `Space t`
 
-neotest finds tests in the file and project and shows the result of each as a
-sign beside it, with failures as diagnostics on the failing line.
+neotest finds the tests in the file and in the project. It shows the result of
+each test as a sign next to the test. A failure also shows as a diagnostic on
+the line that failed.
 
-| Keys | Does |
+| Keys | Action |
 |---|---|
-| `Space t r` | Run the test under the cursor |
-| `Space t t` | Run every test in this file |
-| `Space t T` | Run the whole project's tests |
+| `Space t r` | Run the test at the cursor |
+| `Space t t` | Run all tests in this file |
+| `Space t T` | Run the tests of the full project |
 | `Space t l` | Run the last run again |
-| `Space t d` | Debug the test under the cursor (stops at breakpoints) |
-| `Space t o` | Output of the test under the cursor |
-| `Space t O` | Output panel for all runs |
-| `Space t s` | Summary tree: every test and its state; inside, `r` runs, `d` debugs, `o` shows output, `i` jumps to the test, `Enter` expands |
-| `Space t w` | Re-run this file's tests on every save |
+| `Space t d` | Debug the test at the cursor. The run stops at breakpoints |
+| `Space t o` | Show the output of the test at the cursor |
+| `Space t O` | Show the output panel for all runs |
+| `Space t s` | Show the summary tree, with each test and its state |
+| `Space t w` | Run the tests of this file again after each save |
 | `Space t S` | Stop the run |
 
-Python tests run with pytest from the project's `.venv`, Go tests with
-`go test`, Rust tests with cargo. Java tests use the same keys but run through
-jdtls ([Java and Spring](#java-and-spring)).
+The summary tree has its own keys:
+
+| Key in the summary | Action |
+|---|---|
+| `r` | Run the test |
+| `d` | Debug the test |
+| `o` | Show the output |
+| `i` | Go to the test |
+| `Enter` | Expand the item |
+
+Python tests run with pytest from the `.venv` of the project. Go tests run with
+`go test`, and Rust tests run with cargo. Java tests use the same keys but run
+through jdtls. See [Java and Spring](#java-and-spring).
+
+### Example: correct a test that fails
+
+1. Open the test file and press `Space t t`. A sign shows next to each test.
+2. Press `]d` to go to the diagnostic of the failed test.
+3. Press `Space t o` to read the output of that test.
+4. Press `Space t w`. From now on, each save runs the tests of the file again.
+5. Correct the code and save with `Ctrl-S`. The sign changes when the test
+   passes.
 
 ## Debugging: `Space d` and the F-keys
 
-Set a breakpoint, then start. The debug panel opens at the bottom when a
-session starts (variables, watches, call stack, breakpoints, threads, REPL,
-console; switch with the letters shown in its bar) and closes when it ends.
+Set a breakpoint, then start. When a session starts, the debug panel opens at
+the bottom. It closes when the session ends.
 
-| Keys | IntelliJ key | Does |
+The panel has these views: variables, watches, call stack, breakpoints,
+threads, REPL and console. The bar of the panel shows a letter for each view.
+Press the letter to go to the view.
+
+| Keys | IntelliJ key | Action |
 |---|---|---|
-| `Space d b` | `Ctrl-F8` | Toggle breakpoint |
-| `Space d B` | | Conditional breakpoint (asks for the condition) |
-| `Space d L` | | Log point: prints a message instead of stopping |
+| `Space d b` | `Ctrl-F8` | Toggle a breakpoint |
+| `Space d B` | | Set a conditional breakpoint. The editor asks for the condition |
+| `Space d L` | | Set a log point. It prints a message and does not stop |
 | `Space d c` | `F9` | Start, or continue to the next breakpoint |
 | `Space d C` | `Alt-F9` | Run to the cursor |
 | `Space d O` | `F8` | Step over |
@@ -532,63 +838,114 @@ console; switch with the letters shown in its bar) and closes when it ends.
 | `Space d P` | | Pause |
 | `Space d t` | `Ctrl-F2` | Stop |
 | `Space d l` | | Run the last configuration again |
-| `Space d e` | | Value of the expression under the cursor or selected |
-| `Space d w` | | Add the expression under the cursor to the watches |
+| `Space d e` | | Show the value of the expression at the cursor, or of the selection |
+| `Space d w` | | Add the expression at the cursor to the watches |
 | `Space d u` | | Show or hide the debug panel |
 
-For Python, `Space d c` offers to run the current file, and `Space t d`
-debugs a single test. The debugger runs as
-`uv run --with debugpy python -m debugpy.adapter` in the project, so it uses
-the project's interpreter and packages; the first run needs the network if
-debugpy is not yet in uv's cache.
+The debugger is different for each language:
 
-Go debugs with delve. C, C++ and Rust debug with Apple's `lldb-dap` from the
-Command Line Tools; a Rust program's output appears in the panel's console.
+| Language | Debugger |
+|---|---|
+| Python | debugpy. `Space d c` offers to run the current file, and `Space t d` debugs one test |
+| Go | delve |
+| C, C++, Rust | `lldb-dap` from Apple. It comes with the Command Line Tools. The output of a Rust program shows in the console of the panel |
+| Java | jdtls. See [Java and Spring](#java-and-spring) |
+
+For Python, the debugger runs in the project as
+`uv run --with debugpy python -m debugpy.adapter`. Thus it uses the interpreter
+and the packages of the project. A network connection is necessary for the
+first run if debugpy is not in the cache of uv.
+
+### Example: stop only when a condition is true
+
+1. Put the cursor on a line in a loop.
+2. Press `Space d B` and type the condition, for example `i == 42`.
+3. Press `Space d c` to start. The program stops only when `i` is 42.
+4. Press `Space d w` on a variable to add it to the watches.
+5. Press `Space d t` to stop the session.
 
 ## Claude Code in the editor
 
-Claude Code runs in its own Ghostty split, not inside Neovim. With Neovim
-open in the project, type `/ide` in Claude Code and pick Neovim. From then on
-Claude sees the file you are in and what you have selected, and proposed
-edits open here as a diff to accept or reject.
+Claude Code runs in its own Ghostty split, not in Neovim. To connect the two,
+do these steps:
 
-| Keys | Does |
+1. Open Neovim in the project.
+2. Type `/ide` in Claude Code.
+3. Select Neovim.
+
+After that, Claude sees the current file and your selection. Each edit that
+Claude proposes opens in Neovim as a diff, and you accept it or reject it.
+
+| Keys | Action |
 |---|---|
-| `Space a s` (visual) | Send the selection to Claude |
-| `Space a b` | Add this file to Claude's context |
-| `Space a a` | Accept Claude's proposed change (in the diff) |
-| `Space a d` | Reject it |
-| `Space a S` | Connection status |
+| `Space a s` (visual mode) | Send the selection to Claude |
+| `Space a b` | Add this file to the context of Claude |
+| `Space a a` | Accept the change that Claude proposes (in the diff) |
+| `Space a d` | Reject the change |
+| `Space a S` | Show the connection status |
+
+Example: ask about a part of a file.
+
+1. Select the lines in visual mode (`V`, then `j`).
+2. Press `Space a s`.
+3. Go to the Claude Code split and type your question.
+4. When Claude proposes an edit, read the diff in Neovim.
+5. Press `Space a a` to accept the edit, or `Space a d` to reject it.
 
 ## Spelling
 
-English and Serbian Latin are checked together. Markdown, plain text and Git
-commit messages start with spelling and soft wrap on; elsewhere use `Space u s`.
+The spell check uses English and Serbian Latin together. It is on, with soft
+wrap, in Markdown files, plain text files and Git commit messages. In other
+files, use `Space u s`.
 
-| Keys | Does |
+| Keys | Action |
 |---|---|
-| `]s` / `[s` | Next / previous misspelled word |
-| `z=` | Suggestions |
+| `]s` / `[s` | Go to the next / previous word with an error |
+| `z=` | Show the suggestions |
 | `zg` | Add the word to your list |
-| `zw` | Mark the word as wrong |
+| `zw` | Mark the word as incorrect |
 | `zug` / `zuw` | Undo `zg` / `zw` |
 
-Added words go to `~/.local/share/nvim/spell/en.utf-8.add`. That file is per
-machine and outside the repository.
+The words that you add go to `~/.local/share/nvim/spell/en.utf-8.add`. That
+file stays on the Mac and is not in the repository.
 
-## Behaviour worth knowing
+Example: correct a word and add a name.
+
+1. Press `]s` to go to the next word with an error.
+2. Press `z=`, and type the number of the correct suggestion.
+3. On a correct name that the dictionary does not know, press `zg`.
+
+## Other behaviour
 
 - Yank and paste use the macOS clipboard directly.
-- Files changed outside Neovim (by Git, lazygit or Claude Code) reload when
-  the Neovim window regains focus. With unsaved changes, Neovim asks first.
-- There are no swap or backup files. Undo history is kept across sessions.
-- Files larger than 1.5 MB open without syntax highlighting, to stay fast.
-- Reopening a file returns to where you left it.
-- Indentation defaults to four spaces; a project's `.editorconfig` overrides it.
-- The colours are Monokai Pro "Sun", set to match Ghostty's
-  "Monokai Pro Light Sun". Both are light themes.
+- Neovim loads a file again when a different program changes it, for example
+  Git, lazygit or Claude Code. This occurs when the Neovim window gets the
+  focus. If the buffer has changes that are not saved, Neovim asks first.
+- Neovim writes no swap files and no backup files. It keeps the undo history
+  between sessions.
+- A file larger than 1.5 MB opens without syntax highlighting. This keeps the
+  editor fast.
+- When you open a file again, the cursor goes to its last position.
+- The default indentation is four spaces. The `.editorconfig` file of a
+  project has priority.
+- The colour scheme is Monokai Pro "Sun". It matches the "Monokai Pro Light
+  Sun" theme of Ghostty. The two are light themes.
 
-## When something looks wrong
+Example: an `.editorconfig` file that sets two spaces for all files and tabs
+for Makefiles.
+
+```ini
+root = true
+
+[*]
+indent_style = space
+indent_size = 2
+
+[Makefile]
+indent_style = tab
+```
+
+## Problems and solutions
 
 ### Health checks
 
@@ -596,93 +953,115 @@ machine and outside the repository.
 :checkhealth snacks which-key vim.provider
 ```
 
-Expected, and not faults:
+These results are normal. They are not faults:
 
-- The python3, Ruby, Node and Perl providers show as disabled: no plugin needs
-  them, and they would need a global Python, Ruby, Node or Perl.
-- `Snacks.image` errors about `gs`, `tectonic` and `mmdc`: PDF, LaTeX and
-  Mermaid rendering are deliberately not installed. ImageMagick is.
+- The python3, Ruby, Node and Perl providers show as disabled. No plugin uses
+  them, and a global Python, Ruby, Node or Perl is necessary for them.
+- `Snacks.image` shows errors about `gs`, `tectonic` and `mmdc`. The tools to
+  render PDF, LaTeX and Mermaid are intentionally not installed. ImageMagick is
+  installed.
 - conform reports `prettierd unavailable: Condition failed` outside projects
   that configure prettier. That is the intended condition.
-- Headless runs also report the dashboard setup and `vim.ui.select` as not
-  done. Both hook into UIEnter; they are fine in a real terminal.
+- A headless run also reports that the dashboard setup and `vim.ui.select` are
+  not done. The two start on the `UIEnter` event, and they work in a terminal.
 
 ### Language servers
 
 ```vim
-:checkhealth vim.lsp     " servers configured, attached, their root and log path
+:checkhealth vim.lsp     " the configured servers, the attached servers, their root and log path
 :lsp restart             " restart the servers of this buffer
 ```
 
-`Space c l` lists the servers for the current buffer. The log is
-`~/.local/state/nvim/lsp.log`; `:lua vim.lsp.log.set_level("debug")` makes it
-verbose for the session.
+`Space c l` shows the servers of the current buffer. The log is
+`~/.local/state/nvim/lsp.log`. To get more detail in the log for this session,
+run `:lua vim.lsp.log.set_level("debug")`.
 
-A server that does not attach: check `:set filetype?`, then whether its root
-markers exist (shown in `:checkhealth vim.lsp`). Servers that come from the
-project rather than the editor (named in the language sections above) only
-exist when Neovim was started inside that directory, after direnv loaded it.
+If a server does not attach, do these checks in sequence:
 
-nixd evaluates this flake for option completion. If option docs stop
-appearing after a change, `:lsp restart`; a broken evaluation shows in the
+1. Run `:set filetype?` and make sure that the file type is correct.
+2. Run `:checkhealth vim.lsp` and make sure that the root markers of the
+   server exist.
+3. If the server comes from the project, make sure that you started Neovim in
+   the project directory after direnv loaded the dev shell. The language
+   sections above name these servers.
+
+nixd evaluates this flake to complete options. If the option documentation
+stops after a change, run `:lsp restart`. An evaluation that fails shows in the
 LSP log.
 
-### Formatting, tests, debugging
+### Formatting, tests and debugging
 
 ```vim
-:ConformInfo             " formatters for this buffer, whether each is available, the log
-:lua print(_G.workstation_autoformat(0))   " would saving format this buffer?
+:ConformInfo             " the formatters of this buffer, if each one is available, and the log
+:lua print(_G.workstation_autoformat(0))   " does a save format this buffer?
 :checkhealth dap
-:DapShowLog              " nvim-dap's log (adapter start-up, protocol errors)
+:DapShowLog              " the log of nvim-dap (adapter start, protocol errors)
 ```
 
-A project's `.nvim.lua` is only read after `:trust`; `:trust ++remove`
-revokes it. Python's debug adapter writes its stderr to
-`~/.local/state/nvim/dap-python-stderr.log`; a session that never starts is
-usually uv failing to resolve the project (read that log) or a project without
-a `.venv` yet (`uv sync`). neotest has no health check: if every test shows as
-skipped, run `:lua require("neotest.logging"):set_level(vim.log.levels.DEBUG)`,
-run again, then read `~/.local/state/nvim/neotest.log`.
+| Symptom | Cause and solution |
+|---|---|
+| A `.nvim.lua` file has no effect | Neovim reads the file only after `:trust`. `:trust ++remove` cancels the trust |
+| A Python debug session does not start | uv cannot resolve the project, or the project has no `.venv`. Read `~/.local/state/nvim/dap-python-stderr.log`, and run `uv sync` |
+| neotest shows all tests as skipped | Get the log. See the procedure below |
+
+neotest has no health check. To get its log, do these steps:
+
+1. Run `:lua require("neotest.logging"):set_level(vim.log.levels.DEBUG)`.
+2. Run the tests again.
+3. Read `~/.local/state/nvim/neotest.log`.
 
 ### Java
 
 ```vim
-:JdtShowLogs             " jdtls' own log
-:JdtWipeDataAndRestart   " forget the project import and start over
-:JdtUpdateConfig         " re-read pom.xml / build.gradle after editing it
-:JdtUpdateDebugConfig    " re-scan main classes for Space d c
+:JdtShowLogs             " the log of jdtls
+:JdtWipeDataAndRestart   " delete the project import and start again
+:JdtUpdateConfig         " read pom.xml or build.gradle again after an edit
+:JdtUpdateDebugConfig    " find the main classes again for Space d c
 ```
 
-jdtls keeps one workspace per project under `~/.cache/nvim/jdtls/workspace/`;
-its OSGi log is `.metadata/.log` in there, where a debug or test extension that
-does not load shows as `Could not resolve module`. The Spring Boot server logs
-to `~/.local/state/nvim/spring-boot-ls.log`. The project's JDK is read from
-`JAVA_HOME` when jdtls starts; if the project shell was not loaded then,
-`:JdtSetRuntime` switches it afterwards.
+jdtls keeps one workspace for each project in
+`~/.cache/nvim/jdtls/workspace/`. Its OSGi log is `.metadata/.log` in that
+workspace. If a debug extension or a test extension does not load, the log
+shows `Could not resolve module`.
 
-### Claude Code connection
+The Spring Boot server writes its log to
+`~/.local/state/nvim/spring-boot-ls.log`.
 
-`:ClaudeCodeStatus` shows whether the server runs and a client is connected.
-The server writes `~/.claude/ide/<port>.lock` while Neovim runs; `/ide` in
-Claude Code lists the Neovim instances it finds there.
+jdtls reads the JDK of the project from `JAVA_HOME` when it starts. If the
+project shell was not loaded at that time, use `:JdtSetRuntime` to change the
+JDK.
+
+### The connection to Claude Code
+
+`:ClaudeCodeStatus` shows if the server runs and if a client is connected.
+
+While Neovim runs, the server writes the file `~/.claude/ide/<port>.lock`.
+`/ide` in Claude Code shows the Neovim instances that it finds there.
 
 ### Treesitter
 
 ```vim
 :checkhealth vim.treesitter
 :InspectTree            " the syntax tree of the current buffer
-:Inspect                " highlight groups and captures under the cursor
+:Inspect                " the highlight groups and captures at the cursor
 ```
 
-Every grammar comes from Nix; `:TSInstall` is never needed. If a file type has
-no highlighting, check `:set filetype?` first, then whether
-`vim.treesitter.language.get_lang(vim.bo.filetype)` names a parser.
+All grammars come from Nix. `:TSInstall` is never necessary.
+
+If a file type has no highlighting, do these checks:
+
+1. Run `:set filetype?` and make sure that the file type is correct.
+2. Run this command and make sure that it prints the name of a parser:
+
+   ```vim
+   :lua print(vim.treesitter.language.get_lang(vim.bo.filetype))
+   ```
 
 ## How the editor is built
 
-### Building without activating
+### Build the editor without activation
 
-The editor alone, much faster than a full system build:
+You can build only the editor. This is much faster than a full system build.
 
 ```bash
 host=$(cat /etc/workstation-host)
@@ -692,45 +1071,75 @@ nix build --no-link --print-out-paths \
   ".#darwinConfigurations.$host.config.home-manager.users.$USER.programs.nixvim.build.initFile"
 ```
 
-The built `nvim` runs against that `init.lua` without touching `~/.config`:
-`<package>/bin/nvim -u <initFile> somefile`. To leave your real undo history,
-shada and spell list alone while testing, point `XDG_DATA_HOME`,
-`XDG_STATE_HOME` and `XDG_CACHE_HOME` at a scratch directory. After
-activation, `nixvim-print-init` prints the active `init.lua`.
+The first command prints the path of the package. The second command prints
+the path of its `init.lua`. Run the built `nvim` with that file, and
+`~/.config` stays unchanged:
+
+```bash
+<package>/bin/nvim -u <initFile> somefile
+```
+
+A test can change your real undo history, shada file and spell list. To
+prevent that, point `XDG_DATA_HOME`, `XDG_STATE_HOME` and `XDG_CACHE_HOME` to a
+scratch directory:
+
+```bash
+scratch=$(mktemp -d)
+XDG_DATA_HOME=$scratch/data XDG_STATE_HOME=$scratch/state XDG_CACHE_HOME=$scratch/cache \
+  <package>/bin/nvim -u <initFile> somefile
+```
+
+After activation, `nixvim-print-init` prints the active `init.lua`.
 
 ### One plugin directory
 
-`performance.combinePlugins` merges all plugins into one directory, and a
-build fails if two plugins ship the same file. The fix is to list one of them
-in `performance.combinePlugins.standalonePlugins` next to its config. Plugins
-that read files outside the standard runtime directories must be standalone
-too, or they break quietly (neotest-python runs `neotest.py` from its plugin
-root). The current list: snacks, blink.cmp, friendly-snippets, neotest-python,
-nvim-jdtls.
+`performance.combinePlugins` merges all plugins into one directory. The build
+fails if two plugins contain the same file. To correct that, add one of the two
+plugins to `performance.combinePlugins.standalonePlugins`, next to its
+configuration.
+
+A plugin that reads files outside the standard runtime directories must also
+be standalone. If it is not, it fails without an error message. An example is
+neotest-python. It runs `neotest.py` from its plugin root.
+
+The standalone plugins are snacks, blink.cmp, friendly-snippets,
+neotest-python and nvim-jdtls.
 
 ### Lazy loading
 
-Some plugins load on first use instead of at startup (`nixvim/lazy.nix`,
-lz.n):
+Some plugins load when you first use them, not at startup. The configuration
+is in `nixvim/lazy.nix`, and the loader is lz.n.
 
-| Plugin | Loads |
+| Plugin | Loads with |
 |---|---|
-| nvim-dap, nvim-dap-view | First `Space d` key or F-key, a `:Dap…` command, a Java file (jdtls) or a Rust file (rust-analyzer attaching) |
-| neotest | First `Space t` key, `:Neotest`, or a Rust file (rust-analyzer attaching) |
-| claudecode | Straight after the first screen is drawn |
-| bufferline | Straight after the first screen is drawn |
-| render-markdown | First Markdown file |
-| crates.nvim | First `Cargo.toml` opened |
+| nvim-dap, nvim-dap-view | The first `Space d` key or F-key, a command that starts with `:Dap`, a Java file (jdtls), or a Rust file (when rust-analyzer attaches) |
+| neotest | The first `Space t` key, `:Neotest`, or a Rust file (when rust-analyzer attaches) |
+| claudecode | Immediately after Neovim draws the first screen |
+| bufferline | Immediately after Neovim draws the first screen |
+| render-markdown | The first Markdown file |
+| crates.nvim | The first `Cargo.toml` file |
 
-Everything else loads at startup, on purpose: blink.cmp (servers need its
-capabilities before they start), schemastore (read while server configs are
-built), nvim-jdtls and spring-boot (must be in place before a Java file's
-`FileType` and attach events), and the rest cost too little to matter.
+All other plugins load at startup. Some of them must:
 
-Code that uses a lazy plugin loads it with
-`require("lz.n").trigger_load("<plugin directory name>")` first: Neovim can
-`require` a Lua module from a not-yet-loaded plugin and would then skip its
-setup. `:lua require("lz.n").trigger_load("nvim-dap")` loads one by hand.
+| Plugin | Reason |
+|---|---|
+| blink.cmp | The language servers must have its capabilities before they start |
+| schemastore | The server configurations read it while they are built |
+| nvim-jdtls, spring-boot | They must be loaded before the `FileType` event and the attach event of a Java file |
+
+The other plugins are so small that lazy loading gives no advantage.
+
+Code that uses a lazy plugin must load it first, with this call:
+
+```lua
+require("lz.n").trigger_load("<plugin directory name>")
+```
+
+The reason is that Neovim can `require` a Lua module from a plugin that is not
+loaded. It then does not run the setup of the plugin.
+
+To load one plugin manually, run for example
+`:lua require("lz.n").trigger_load("nvim-dap")`.
 
 ### Startup time
 
@@ -738,11 +1147,18 @@ setup. `:lua require("lz.n").trigger_load("nvim-dap")` loads one by hand.
 for i in 1 2 3 4 5; do nvim --headless --startuptime /tmp/nvim-st.$i +qa; tail -1 /tmp/nvim-st.$i; done
 ```
 
-The last line of each log is the total in milliseconds. When a start passes
-about 100 ms, look for plugins that could load lazily. Opening the first file
-of a type also adds one-time work that lazy loading cannot defer: its
-Treesitter grammar, spell files and language servers.
+The last line of each log is the total time in milliseconds. If a start takes
+more than approximately 100 ms, look for plugins that can load lazily.
 
-`which -a nvim` shows only the Nix copy
-(`/etc/profiles/per-user/$USER/bin/nvim`). A broken build is undone with
-`ws rollback`.
+The first file of a type also adds work that occurs one time and that lazy
+loading cannot move: its Treesitter grammar, the spell files and the language
+servers.
+
+`which -a nvim` shows only the Nix copy:
+
+```console
+$ which -a nvim
+/etc/profiles/per-user/alice/bin/nvim
+```
+
+If a new build of the editor does not work, run `ws rollback`.
