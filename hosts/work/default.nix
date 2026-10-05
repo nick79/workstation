@@ -58,6 +58,14 @@ let
     '';
     meta = old.meta // { platforms = lib.platforms.unix; };
   });
+
+  # semgrep pins pyjwt~=2.13.0, but nixpkgs moved pyjwt to 2.14.0 and the
+  # runtime dependency check fails the build. A minor pyjwt release keeps
+  # its API, so relax the pin as nixpkgs does for semgrep's other
+  # dependencies. Drop this once nixpkgs relaxes or bumps it.
+  semgrep = pkgs.semgrep.overridePythonAttrs (old: {
+    pythonRelaxDeps = (old.pythonRelaxDeps or [ ]) ++ [ "pyjwt" ];
+  });
 in
 {
   # The account; every home path derives from it (modules/darwin/user.nix).
@@ -87,7 +95,7 @@ in
     # and ZAP (a GUI app, started with `zap`).
     home.packages = [
       pkgs.cdxgen
-      pkgs.semgrep
+      semgrep
       zap
     ];
 
