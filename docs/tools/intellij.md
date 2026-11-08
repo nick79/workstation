@@ -31,6 +31,16 @@ project and gives the terminal back immediately. The `idea` command of the
 cask keeps the terminal busy until IntelliJ IDEA quits. To use that command,
 for example for `idea diff`, type `command idea`.
 
+IntelliJ IDEA keeps the settings of each project in the `.idea` directory of
+the project. The global Git ignore list contains `.idea/`, thus Git does not
+show or commit that directory. The data sources in `.idea` contain host names
+and user names. A file that Git already tracks stays tracked. To share a new
+file from `.idea` with a team, add it with force:
+
+```bash
+git add -f .idea/runConfigurations/App.xml
+```
+
 ## The toolchain of a project
 
 Each project gets its toolchain from its Nix dev shell. See
@@ -320,7 +330,8 @@ Example: connect to a PostgreSQL database on port 5432 of the Mac.
 5. Right-click the data source and select **New > Query Console** to write SQL.
 
 IntelliJ IDEA keeps the passwords in the macOS Keychain, not in the project.
-The data source itself goes into the `.idea` directory of the project.
+The data source itself goes into the `.idea` directory of the project, which
+Git ignores.
 
 For a database behind a bastion host, start an SSH tunnel first. See
 [ssh.md](ssh.md#a-database-port-on-your-mac).

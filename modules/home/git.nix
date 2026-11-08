@@ -189,6 +189,9 @@ in
       "**/.claude/settings.local.json"
       # direnv / nix-direnv per-project cache
       ".direnv/"
+      # IntelliJ IDEA's per-project settings; data sources name hosts and
+      # users. A repository that shares some of them adds them with -f.
+      ".idea/"
     ];
   };
 
