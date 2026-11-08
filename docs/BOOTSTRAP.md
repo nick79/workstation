@@ -409,7 +409,7 @@ On a new Mac, give the name explicitly:
 ```
 
 Activation writes the name to `/etc/workstation-host`. Subsequent runs of the
-script, `ws` and Neovim read the name from that file.
+script and `ws` read the name from that file.
 
 Without `--host` and before the first activation, the script uses the host
 name of the Mac. If no `hosts/<name>` matches, the script stops and shows the
@@ -462,8 +462,8 @@ the Mac. Do the other checks manually:
 
 - The prompt shows correctly and the shell plugins load. For example, the
   shell shows a grey suggestion while you type a command from the history.
-- `nvim` opens with the configuration of this repository. `Space` shows the
-  which-key menu.
+- `nvim` opens with the configuration of this repository. The colours are
+  the light Monokai Pro theme, the same as in Ghostty.
 - The declared casks are installed. `ws list` shows them in the section
   `Homebrew: casks`.
 - The macOS settings are active. Also look at the Control Center items in the

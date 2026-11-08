@@ -16,7 +16,8 @@ The configuration supports only Macs with Apple silicon (`aarch64-darwin`).
 | Nix | Builds and installs each package at the version in `flake.lock` |
 | nix-darwin | Applies the system configuration: macOS settings, the firewall, Touch ID for `sudo` |
 | Home Manager | Applies the user configuration: the shell, Git, SSH, the command-line tools |
-| NixVim | Builds Neovim with its plugins and language servers |
+| NixVim | Builds Neovim, the editor for quick edits in the terminal |
+| IntelliJ IDEA Ultimate | The IDE for development. It also connects to databases and to Docker |
 | Ghostty | The terminal |
 | zsh and Starship | The shell and its prompt |
 | Claude Code | The coding assistant |
@@ -34,7 +35,7 @@ the exception, because `uv` supplies Python.
 | `hosts/` | The settings that are different on each Mac: the user account, private applications, power settings |
 | `modules/darwin/` | The shared system configuration: macOS settings, Homebrew casks, the firewall, Touch ID for `sudo` |
 | `modules/home/` | The shared user configuration: the shell, Git, SSH, command-line tools, containers, Ghostty, Claude Code, `ws` |
-| `nixvim/` | The editor: Neovim with language servers, formatters, debuggers and test runners |
+| `nixvim/` | Neovim: its options, keys, colour scheme and Treesitter |
 | `scripts/bootstrap.sh` | The script that sets up a new Mac. With `--check`, it only writes a report |
 | `docs/` | The procedure for a new Mac and one guide for each tool |
 
@@ -82,14 +83,15 @@ problems.
 | Guide | Contents |
 |---|---|
 | [Shell](docs/tools/shell.md) | zsh, vi mode, the history, fzf keys, aliases and functions, zoxide, man pages, Starship |
-| [CLI tools](docs/tools/cli.md) | fd, ripgrep, fzf, jq, bat, eza, wget, typst, yq, lazydocker, lazysql |
+| [CLI tools](docs/tools/cli.md) | fd, ripgrep, fzf, jq, bat, eza, wget, typst, yq |
 | [Claude Code](docs/tools/claude-code.md) | The settings that all Macs share and the settings that stay on one Mac: rules, status line, permissions, memory |
 | [direnv](docs/tools/direnv.md) | Nix dev shells that load when you go into a project directory |
 | [Containers](docs/tools/containers.md) | Colima and Docker: the rules, daily use, a profile for each project |
 | [SSH](docs/tools/ssh.md) | The shared `~/.ssh/config`, the private hosts in `~/.ssh/config.local`, examples, keys |
 | [Git](docs/tools/git.md) | lazygit, merge conflicts, diffs with ec and delta, the email address of each Mac, the scan for secrets, the GitHub CLI (`gh`) |
 | [Projects](docs/tools/projects.md) | The files that a project must have for each language (`flake.nix`, `.envrc`, `pyproject.toml`), and what the editor gets from each file |
-| [Neovim](docs/tools/neovim.md) | Keys, pickers, buffers and windows, toggles, spelling, and each supported language |
+| [IntelliJ IDEA](docs/tools/intellij.md) | The IDE: the toolchain of each project, Docker through Colima, databases, Claude Code |
+| [Neovim](docs/tools/neovim.md) | The editor for quick edits in the terminal: keys, files, spelling, folds |
 | [ws](docs/tools/ws.md) | How to build, activate, update and roll back the workstation, with Homebrew updates, uv updates and garbage collection |
 
 ## License

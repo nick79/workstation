@@ -19,6 +19,9 @@
       "font-jetbrains-mono-nerd-font"
       "ghostty"
       "iina"
+      # IntelliJ IDEA Ultimate, the development IDE (docs/tools/intellij.md).
+      # It updates itself; the cask also installs the `idea` command.
+      "intellij-idea"
       "rectangle"
       "the-unarchiver"
       "typora"

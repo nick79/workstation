@@ -46,16 +46,7 @@ in
     };
   };
 
-  # Explorer names: plain text colour unless Git status colours them
-  # (modified orange, new green). The theme gives Directory a background
-  # band and the sidebar a pale grey, which made clean files look disabled.
-  # In this theme NonText is the background colour, which made hidden and
-  # ignored files invisible; they are dimmed instead.
-  highlightOverride = {
-    Directory.fg = palette.text;
-    SnacksPickerDirectory.fg = palette.text;
-    SnacksPickerFile.fg = palette.text;
-    SnacksPickerPathHidden.fg = palette.dimmed2;
-    SnacksPickerPathIgnored.fg = palette.dimmed3;
-  };
+  # Directory names (netrw, `nvim .`) in the plain text colour. The theme
+  # draws them pale grey on a background band, which looks disabled.
+  highlightOverride.Directory.fg = palette.text;
 }

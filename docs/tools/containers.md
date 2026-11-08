@@ -67,8 +67,8 @@ docker compose down           # stop the services
 colima stop
 ```
 
-`lazydocker` shows the containers, the images and the logs in the terminal.
-See [cli.md](cli.md#containers-lazydocker).
+IntelliJ IDEA shows the containers, the images and the logs in its Services
+tool window. See [intellij.md](intellij.md#docker-and-colima).
 
 ## A profile for one project
 

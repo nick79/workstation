@@ -184,12 +184,15 @@ Host db-tunnel
   LocalForward 5433 10.0.5.12:5432
 ```
 
-Start the tunnel in one terminal, and connect in a second terminal:
+Start the tunnel in a terminal:
 
 ```bash
-ssh -N db-tunnel                                  # stays open until you press Ctrl-C
-lazysql postgres://admin@localhost:5433/app       # in the second terminal
+ssh -N db-tunnel          # stays open until you press Ctrl-C
 ```
+
+Then connect from IntelliJ IDEA. Add a PostgreSQL data source with the host
+`localhost`, the port `5433` and the database `app`. See
+[intellij.md](intellij.md#databases).
 
 ### A second GitHub account
 

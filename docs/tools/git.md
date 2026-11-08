@@ -399,7 +399,7 @@ Example: do a review of the pull request of a colleague on your Mac.
 
 ```bash
 gh pr checkout 42
-nvim .
+idea .
 gh pr review 42 --approve
 ```
 

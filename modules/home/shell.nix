@@ -101,6 +101,15 @@ in
         mkcd() {
           mkdir -p -- "$1" && cd -- "$1"
         }
+
+        # IntelliJ IDEA without holding the terminal: the cask's `idea` runs
+        # the IDE in the foreground until it quits. `open -n` hands the
+        # arguments over even when the IDE already runs, and the IDE's
+        # launcher resolves `.` from the inherited $PWD. `command idea`
+        # still reaches the cask's command (for `idea diff`, `idea merge`).
+        idea() {
+          open -na "IntelliJ IDEA.app" --args "$@"
+        }
       ''
     ];
   };

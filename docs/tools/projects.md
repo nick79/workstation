@@ -15,8 +15,8 @@ language.
 Python is different. `uv` supplies Python, because the Python from nixpkgs had
 problems when it loaded libraries (libffi) on macOS. Examine the state of that
 problem again before you change this rule. A Python project keeps all its
-configuration in `pyproject.toml`. uv, ruff, ty, pytest and rumdl read that
-file. A `flake.nix` is not necessary.
+configuration in `pyproject.toml`. uv, ruff and pytest read that file. A
+`flake.nix` is not necessary.
 
 ## The procedure for all languages
 
@@ -37,12 +37,13 @@ file. A `flake.nix` is not necessary.
    minutes.
 5. Commit the new `flake.lock` file. The versions then stay the same until you
    run `nix flake update` and `direnv reload`.
-6. Start Neovim from the project directory, after direnv loaded the dev shell.
+6. Open the project in IntelliJ IDEA with `idea .`, and set its SDK one time.
+   See [intellij.md](intellij.md#set-up-a-project-one-time).
 
-Step 6 is important. Some language servers and tools must match the project,
-and the table below shows them in the column "The project supplies". Neovim
-finds them on the `PATH` of the project. If you start Neovim from a different
-directory, they are not available.
+Each `flake.nix` in this guide also makes a link to each toolchain in
+`.direnv/sdk`, in its `shellHook`. The path of a link does not change when
+Nix updates the toolchain. Thus IntelliJ IDEA uses the links as its SDK paths.
+See [intellij.md](intellij.md#stable-paths-in-direnvsdk).
 
 All repositories ignore `.direnv/`. Do not commit that directory.
 
@@ -58,12 +59,15 @@ direnv: loading ~/github/hello/.envrc
 direnv: using flake
 $ go version
 go version go1.25.1 darwin/arm64
+$ ls .direnv/sdk
+go
 $ go mod init example.com/hello
 $ git add flake.lock go.mod
-$ nvim .
+$ idea .
 ```
 
-When you open a `.go` file, gopls starts and uses the Go from the dev shell.
+In IntelliJ IDEA, set GOROOT to `.direnv/sdk/go` one time. The Go plugin then
+uses the Go from the dev shell.
 
 ## Why the files use mkShellNoCC
 
@@ -80,24 +84,27 @@ Nix SDK. This has two bad effects in the shell:
 Use `mkShell` only for a project that must build with the compiler toolchain
 of Nix.
 
-## What the editor supplies and what the project supplies
+## What IntelliJ IDEA gets from the project
 
-Neovim contains most language servers. A server or a linter that must match
-the toolchain of the project comes from the project.
+IntelliJ IDEA and its plugins supply the language support. The project
+supplies the toolchain. The dev shell links the toolchain into `.direnv/sdk`
+for the SDK settings of the IDE.
 
-| Language | The editor supplies | The project supplies |
+| Language | The links in `.direnv/sdk` | The project also supplies |
 |---|---|---|
-| Python | ty, ruff, the debugger launcher | Python (through uv), pytest, packages |
-| Java / Spring | jdtls, Lombok, the debug and test bundles, the Spring Boot language server, and the JDK that these run on | The JDK of the project, Maven or Gradle |
-| JavaScript / TypeScript / Vue | vtsls, vue_ls, the eslint and prettier servers | Node, the package manager, TypeScript, eslint, prettier (`node_modules`) |
-| Go | gopls, delve | Go, golangci-lint |
-| Rust | rustaceanvim. The debugger is `lldb-dap` from Apple | rustc, cargo, rust-analyzer, rustfmt, clippy |
-| C / C++ | clangd, clang-format. The debugger is `lldb-dap` from Apple | The compiler (Apple clang), CMake, libraries, `compile_commands.json` |
-| Ruby | Nothing | Ruby, Bundler, ruby-lsp, and rubocop or standard (Gemfile) |
-| PHP | phpactor | PHP, Composer, php-cs-fixer or phpstan (`vendor/bin`) |
-| Elixir | Expert | Elixir, Erlang |
-| Terraform | terraform-ls | terraform, tflint |
-| Nix, Lua, shell, Markdown, YAML, JSON, TOML | All tools | Nothing |
+| Python | None. IntelliJ IDEA uses `.venv` | Python (through uv), pytest, packages |
+| Java / Spring | `jdk` | Maven or Gradle, or their wrappers |
+| JavaScript / TypeScript / Vue | `node`, `pnpm` | TypeScript, eslint, prettier (`node_modules`) |
+| Go | `go` | golangci-lint |
+| Rust | `rust`, `rust-src` | rustfmt and clippy, in the `rust` link |
+| C / C++ | `cmake` | The compiler (Apple clang), libraries |
+| Ruby | `ruby` | Bundler and the gems in `.gems` |
+| PHP | `php`, `composer` | php-cs-fixer, phpstan or pint (`vendor/bin`) |
+| Elixir | `elixir`, `erlang` | The caches of mix and hex in the project |
+| Terraform | `terraform` | tflint |
+
+[intellij.md](intellij.md#the-setting-for-each-language) gives the setting of
+the IDE for each link.
 
 ## Python
 
@@ -117,13 +124,12 @@ dependencies = [
 [dependency-groups]
 dev = [
     "pytest>=8",
-    "debugpy>=1.8",      # optional: the debugger adds it for the session if it is not there
 ]
 
 [tool.uv]
 package = false          # an application. Remove this line for a library that you publish
 
-[tool.ruff]              # this section also sets format on save to on in Neovim
+[tool.ruff]              # the settings of the ruff linter and formatter
 line-length = 100
 
 [tool.ruff.lint]
@@ -131,9 +137,6 @@ select = ["E", "F", "I", "B", "UP"]   # pycodestyle, pyflakes, imports, bugbear,
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-
-[tool.rumdl]             # optional: the Markdown style for the documents of this project
-disable = ["MD013"]
 ```
 
 To start a new project, run `uv init` or write the file. Then use these
@@ -155,19 +158,23 @@ Commit `pyproject.toml`, `uv.lock` and `.python-version`. Do not commit
 mkcd ~/github/myapp
 uv init
 uv add httpx
-uv add --dev pytest
+uv add --dev pytest ruff
 uv run pytest
-nvim .
+idea .
 ```
 
 `uv init` creates `pyproject.toml` and `.python-version`. The first `uv add`
-creates `.venv` and `uv.lock`. Neovim finds `.venv` automatically, and ty and
-ruff start with the first `.py` file.
+creates `.venv` and `uv.lock`. In IntelliJ IDEA, select the uv environment of
+the project as the Python SDK one time. See
+[intellij.md](intellij.md#python-with-uv).
+
+For Jupyter notebooks, also run `uv add --dev jupyter`. See
+[intellij.md](intellij.md#jupyter-notebooks).
 
 ### The optional .envrc file
 
-An `.envrc` file is optional for Python. Without it, `uv run <command>` works
-and Neovim finds `.venv` automatically.
+An `.envrc` file is optional for Python. Without it, `uv run <command>` works,
+and IntelliJ IDEA uses `.venv` as the interpreter.
 
 With it, `python` and `pytest` work directly in the shell. The effect is the
 same as `source .venv/bin/activate`:
@@ -202,13 +209,24 @@ watch_file pyproject.toml uv.lock
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
 
   outputs = { nixpkgs, ... }:
-    let pkgs = nixpkgs.legacyPackages.aarch64-darwin; in {
+    let
+      pkgs = nixpkgs.legacyPackages.aarch64-darwin;
+      jdk = pkgs.jdk21;
+      # The JDK inside its macOS bundle. IntelliJ IDEA and Gradle expect this
+      # directory, not the top directory of the Nix package.
+      javaHome = "${jdk.bundle}/Contents/Home";
+    in {
       devShells.aarch64-darwin.default = pkgs.mkShellNoCC {
         packages = [
-          pkgs.jdk21
+          jdk
           pkgs.maven             # or pkgs.gradle. Remove both if the project uses ./mvnw or ./gradlew
         ];
-        JAVA_HOME = pkgs.jdk21.home;
+        JAVA_HOME = javaHome;
+        # Stable paths for IntelliJ IDEA (docs/tools/intellij.md).
+        shellHook = ''
+          mkdir -p .direnv/sdk
+          ln -sfn ${javaHome} .direnv/sdk/jdk
+        '';
       };
     };
 }
@@ -220,16 +238,18 @@ use flake
 ```
 
 Use the JDK version that the project targets: `jdk17`, `jdk21` or `jdk25`.
-Change the package and `JAVA_HOME` together.
+Change only the line `jdk = pkgs.jdk21;`.
 
 If the repository has a Maven wrapper or a Gradle wrapper, the wrapper
 downloads its own build tool. Then only the JDK is necessary in the dev shell.
 
-Example: make sure that the shell uses the JDK of the project.
+Example: make sure that the shell and the link use the JDK of the project.
 
 ```console
-$ which java
-/nix/store/<hash>-openjdk-<version>/bin/java
+$ java -version 2>&1 | head -1
+openjdk version "21.0.11" 2026-04-21 LTS
+$ readlink .direnv/sdk/jdk
+/nix/store/<hash>-zulu-ca-jdk-21.0.11/Library/Java/JavaVirtualMachines/zulu-21.jdk/Contents/Home
 $ ./mvnw -v
 ```
 
@@ -249,6 +269,13 @@ The output of `./mvnw -v` contains the Java version and the path of the JDK.
           pkgs.nodejs_22         # must match "engines" in package.json
           pkgs.pnpm              # or remove this line and use npm, which comes with Node
         ];
+        # Stable paths for IntelliJ IDEA (docs/tools/intellij.md). Remove
+        # the pnpm line if the project uses npm.
+        shellHook = ''
+          mkdir -p .direnv/sdk
+          ln -sfn ${pkgs.nodejs_22} .direnv/sdk/node
+          ln -sfn ${pkgs.pnpm} .direnv/sdk/pnpm
+        '';
       };
     };
 }
@@ -262,22 +289,11 @@ PATH_add node_modules/.bin
 
 TypeScript, eslint, prettier and biome are `devDependencies` in
 `package.json`. `pnpm install` or `npm install` puts them in `node_modules`,
-and the editor uses those versions.
+and IntelliJ IDEA uses those versions.
 
-The editor uses each tool only when the project configures it:
-
-| Tool | Condition |
-|---|---|
-| prettier (format) | The project has a prettier configuration file |
-| biome (format) | The project has a `biome.json`. If prettier and biome are both configured, the editor uses biome |
-| eslint (diagnostics) | The project has an eslint configuration file |
-| Tailwind (completion) | `package.json` contains `tailwindcss`, or the project has a `tailwind.config.*` file |
-
-Open Neovim from the project directory, because direnv puts this Node on
-`PATH`. The tools in `node_modules/.bin` are Node scripts. This applies to
-biome, and to eslint or Tailwind servers that a project installs. Without the
-Node of the project they cannot start, and `:LspLog` shows
-`env: node: No such file or directory`.
+The tools in `node_modules/.bin` are Node scripts. They start only with a Node
+interpreter. Thus set the Node interpreter of IntelliJ IDEA to
+`.direnv/sdk/node/bin/node`.
 
 Example: start work on a cloned project.
 
@@ -303,6 +319,11 @@ $ pnpm dev
           pkgs.go
           pkgs.golangci-lint
         ];
+        # Stable paths for IntelliJ IDEA (docs/tools/intellij.md).
+        shellHook = ''
+          mkdir -p .direnv/sdk
+          ln -sfn ${pkgs.go}/share/go .direnv/sdk/go
+        '';
       };
     };
 }
@@ -334,17 +355,23 @@ linters:
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
 
   outputs = { nixpkgs, ... }:
-    let pkgs = nixpkgs.legacyPackages.aarch64-darwin; in {
+    let
+      pkgs = nixpkgs.legacyPackages.aarch64-darwin;
+      # cargo, rustc, rustfmt and clippy in one directory. The Rust plugin of
+      # IntelliJ IDEA expects all of them in its toolchain directory.
+      rust = pkgs.symlinkJoin {
+        name = "rust-toolchain";
+        paths = [ pkgs.rustc pkgs.cargo pkgs.rustfmt pkgs.clippy ];
+      };
+    in {
       devShells.aarch64-darwin.default = pkgs.mkShellNoCC {
-        packages = [
-          pkgs.rustc
-          pkgs.cargo
-          pkgs.rust-analyzer
-          pkgs.rustfmt
-          pkgs.clippy
-        ];
-        # Lets rust-analyzer read the source of the standard library.
-        RUST_SRC_PATH = "${pkgs.rustPlatform.rustLibSrc}";
+        packages = [ rust ];
+        # Stable paths for IntelliJ IDEA (docs/tools/intellij.md).
+        shellHook = ''
+          mkdir -p .direnv/sdk
+          ln -sfn ${rust}/bin .direnv/sdk/rust
+          ln -sfn ${pkgs.rustPlatform.rustLibSrc} .direnv/sdk/rust-src
+        '';
       };
     };
 }
@@ -355,8 +382,9 @@ linters:
 use flake
 ```
 
-rust-analyzer, rustfmt and clippy come from the project, because they must
-match its compiler.
+rustfmt and clippy come from the project, because they must match its
+compiler. `.direnv/sdk/rust-src` is the source of the standard library, for
+the Rust plugin.
 
 Some projects pin a toolchain in `rust-toolchain.toml`. For such a project, a
 Rust overlay (fenix or rust-overlay) is necessary in place of these packages.
@@ -393,6 +421,11 @@ the build tools and the libraries.
           pkgs.pkg-config
           # the libraries that the project links, for example pkgs.openssl
         ];
+        # Stable paths for IntelliJ IDEA (docs/tools/intellij.md).
+        shellHook = ''
+          mkdir -p .direnv/sdk
+          ln -sfn ${pkgs.cmake}/bin/cmake .direnv/sdk/cmake
+        '';
       };
     };
 }
@@ -403,8 +436,12 @@ the build tools and the libraries.
 use flake
 ```
 
-clangd must know the compiler command of each file. With CMake, do these steps
-one time:
+IntelliJ IDEA opens a CMake project from its `CMakeLists.txt`. Set the CMake
+path of the toolchain to `.direnv/sdk/cmake` one time.
+
+A project without CMake must supply a `compile_commands.json` file in its
+root. IntelliJ IDEA then opens the project from that file. To make the file
+with CMake, run these commands:
 
 ```bash
 cmake -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON    # configure the project
@@ -425,9 +462,13 @@ ln -s build/compile_commands.json .                  # link the result into the 
           pkgs.ruby_3_4          # must match .ruby-version
           # the libraries for gems with native extensions, for example pkgs.libyaml, pkgs.postgresql
         ];
+        # The gems go into the project. The link is a stable path for
+        # IntelliJ IDEA (docs/tools/intellij.md).
         shellHook = ''
           export GEM_HOME="$PWD/.gems"
           export PATH="$GEM_HOME/bin:$PATH"
+          mkdir -p .direnv/sdk
+          ln -sfn ${pkgs.ruby_3_4} .direnv/sdk/ruby
         '';
       };
     };
@@ -439,17 +480,18 @@ ln -s build/compile_commands.json .                  # link the result into the 
 use flake
 ```
 
-Add the tools of the editor to the `Gemfile`:
+Add the linter to the `Gemfile`. IntelliJ IDEA shows its results in the
+editor:
 
 ```ruby
 group :development do
-  gem "ruby-lsp", require: false
   gem "rubocop", require: false   # or "standard"
 end
 ```
 
 Then run `bundle install`. Bundler installs the gems into `.gems/` in the
-project. Add `.gems/` to the `.gitignore` of the project.
+project. Add `.gems/` to the `.gitignore` of the project. The run
+configurations of IntelliJ IDEA get `GEM_HOME` through direnv Everywhere.
 
 ## PHP
 
@@ -465,6 +507,12 @@ project. Add `.gems/` to the `.gitignore` of the project.
           pkgs.php84
           pkgs.php84Packages.composer
         ];
+        # Stable paths for IntelliJ IDEA (docs/tools/intellij.md).
+        shellHook = ''
+          mkdir -p .direnv/sdk
+          ln -sfn ${pkgs.php84} .direnv/sdk/php
+          ln -sfn ${pkgs.php84Packages.composer} .direnv/sdk/composer
+        '';
       };
     };
 }
@@ -496,15 +544,24 @@ Put php-cs-fixer, phpstan or pint in `composer.json` below `require-dev`.
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
 
   outputs = { nixpkgs, ... }:
-    let pkgs = nixpkgs.legacyPackages.aarch64-darwin; in {
+    let
+      pkgs = nixpkgs.legacyPackages.aarch64-darwin;
+      # Elixir and the Erlang that it was built with, from one package set.
+      beam = pkgs.beam.packages.erlang;
+    in {
       devShells.aarch64-darwin.default = pkgs.mkShellNoCC {
         packages = [
-          pkgs.elixir            # includes an Erlang that matches
+          beam.elixir            # includes an Erlang that matches
         ];
+        # The caches of mix and hex go into the project. The links are
+        # stable paths for IntelliJ IDEA (docs/tools/intellij.md).
         shellHook = ''
           export MIX_HOME="$PWD/.nix-mix"
           export HEX_HOME="$PWD/.nix-hex"
           export PATH="$MIX_HOME/bin:$HEX_HOME/bin:$PATH"
+          mkdir -p .direnv/sdk
+          ln -sfn ${beam.elixir}/lib/elixir .direnv/sdk/elixir
+          ln -sfn ${beam.erlang}/lib/erlang .direnv/sdk/erlang
         '';
       };
     };
@@ -518,7 +575,8 @@ use flake
 
 `mix` and `hex` keep their caches in the project. Add `.nix-mix/` and
 `.nix-hex/` to the `.gitignore` of the project. The formatter obeys the
-`.formatter.exs` file of the project.
+`.formatter.exs` file of the project. The run configurations of IntelliJ IDEA
+get `MIX_HOME` and `HEX_HOME` through direnv Everywhere.
 
 ## Terraform
 
@@ -542,6 +600,11 @@ packages by default. Thus the flake lets Nix install only that one package:
           pkgs.terraform
           pkgs.tflint
         ];
+        # Stable paths for IntelliJ IDEA (docs/tools/intellij.md).
+        shellHook = ''
+          mkdir -p .direnv/sdk
+          ln -sfn ${pkgs.terraform} .direnv/sdk/terraform
+        '';
       };
     };
 }

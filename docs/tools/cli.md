@@ -264,13 +264,7 @@ warning.
 
 ## Shell scripts: shellcheck and shfmt
 
-These two tools are not installed globally. Linters and formatters come with
-the Neovim configuration, together with the language server that uses them.
-
-In Neovim, `bash-language-server` runs shellcheck while you type. `Space c f`
-formats the file with shfmt.
-
-For one check outside the editor, run the tools without an installation:
+These two tools are not installed globally. Run them without an installation:
 
 ```bash
 nix run nixpkgs#shellcheck -- script.sh
@@ -279,42 +273,7 @@ nix run nixpkgs#shfmt -- -d -i 2 script.sh    # show the format changes as a dif
 
 The build of `ws` runs shellcheck on the `ws` script automatically.
 
-## Containers: lazydocker
+## Containers and databases
 
-lazydocker is a terminal interface for containers, images, volumes, logs and
-statistics. It uses the same key layout as lazygit.
-
-lazydocker works only while a Docker engine runs. On this workstation the engine is
-Colima, and Colima does not start automatically. Thus its VM uses no memory
-until you start it.
-
-```bash
-colima start          # start the VM when containers are necessary
-lazydocker
-colima stop           # stop the VM after the work
-```
-
-| Key | Action |
-|---|---|
-| `?` | Show the help |
-| `[` and `]` | Go to the previous tab or the next tab |
-| `Enter` | Show the logs |
-| `r` | Restart the container |
-| `d` | Remove the container |
-| `q` | Quit |
-
-See [containers.md](containers.md) for Colima.
-
-## Databases: lazysql
-
-lazysql is a terminal interface for SQL databases: PostgreSQL, MySQL, SQLite
-and SQL Server.
-
-```bash
-lazysql                                      # manage the saved connections
-lazysql postgres://user@localhost:5432/db    # open one database directly
-lazysql ./app.db                             # open a SQLite file
-```
-
-lazysql keeps the saved connections in its own configuration file. That file
-can contain passwords. For this reason, this repository does not manage it.
+This workstation has no terminal interface for containers or databases. Use
+IntelliJ IDEA for the two. See [intellij.md](intellij.md).

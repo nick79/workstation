@@ -24,8 +24,8 @@
     let
       # One configuration per Mac, from hosts/<name>. The name is only a label
       # and need not be the Mac's host name (the work Mac is `work`).
-      # Activation records it in /etc/workstation-host, where ws, Neovim and
-      # later bootstrap runs look it up.
+      # Activation records it in /etc/workstation-host, where ws and later
+      # bootstrap runs look it up.
       mkHost = name: nix-darwin.lib.darwinSystem {
         modules = [
           ./modules/darwin

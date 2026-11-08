@@ -12,8 +12,6 @@
 
     pkgs.typst
     pkgs.yq-go # mikefarah's yq; nixpkgs `yq` is a different (Python) tool
-    pkgs.lazydocker
-    pkgs.lazysql
 
     # GitHub CLI. A plain package rather than programs.gh: gh writes its own
     # ~/.config/gh/config.yml on login and `gh config set`, and keeps the

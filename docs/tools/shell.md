@@ -90,6 +90,7 @@ git push origin feature/login-from
 | `path` | Shows `PATH` with one entry on each line, in the search sequence |
 | `ports` | Shows the TCP ports that are open for connections and the process of each port |
 | `mkcd <dir>` | Makes a directory, with its parent directories, and goes into it |
+| `idea <dir>` | Opens the directory as a project in IntelliJ IDEA. The terminal stays free. See [intellij.md](intellij.md) |
 | `z <text>` | zoxide: goes to the directory that best matches the text |
 | `zi` | zoxide: lets you select the directory with fzf |
 | `ws` | Maintains the workstation. See [ws.md](ws.md) |

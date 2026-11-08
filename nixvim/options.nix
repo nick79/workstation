@@ -1,6 +1,6 @@
 { ... }:
 
-# Editor options, autocommands and startup performance.
+# Editor options and autocommands.
 {
   globals = {
     mapleader = " ";
@@ -14,16 +14,12 @@
     cursorline = true;
     mouse = "a";
     termguicolors = true;
-    showmode = false; # lualine shows the mode
-    laststatus = 3; # one statusline for all windows
     confirm = true; # ask to save instead of refusing :q
     scrolloff = 8;
     sidescrolloff = 8;
     smoothscroll = true;
     splitright = true;
     splitbelow = true;
-    splitkeep = "screen";
-    pumheight = 10;
     virtualedit = "block";
     fillchars = "eob: ";
 
@@ -58,12 +54,20 @@
 
     clipboard = "unnamedplus"; # macOS pbcopy/pbpaste
 
-    updatetime = 200;
-    timeoutlen = 300; # which-key opens after this
-
-    spelllang = "en,sr-latin";
+    # English ships with Neovim; no other spell file is installed.
+    spelllang = "en";
     spelloptions = "camel";
   };
+
+  # Words added with `zg` go to a personal list outside the Nix-managed
+  # ~/.config/nvim, so they survive rebuilds. Not tracked in the repository.
+  extraConfigLua = ''
+    do
+      local dir = vim.fn.stdpath("data") .. "/spell"
+      vim.fn.mkdir(dir, "p")
+      vim.opt.spellfile = dir .. "/en.utf-8.add"
+    end
+  '';
 
   autoGroups.workstation.clear = true;
 
@@ -83,12 +87,6 @@
       group = "workstation";
       event = "TextYankPost";
       callback.__raw = "function() vim.hl.on_yank() end";
-    }
-    {
-      desc = "Keep splits equal when the terminal is resized";
-      group = "workstation";
-      event = "VimResized";
-      command = "tabdo wincmd =";
     }
     {
       desc = "Return to the last cursor position";
@@ -116,39 +114,12 @@
         end
       '';
     }
-    {
-      desc = "Close helper windows with q";
-      group = "workstation";
-      event = "FileType";
-      pattern = [ "help" "qf" "checkhealth" ];
-      callback.__raw = ''
-        function(ev)
-          vim.bo[ev.buf].buflisted = false
-          vim.keymap.set("n", "q", "<cmd>close<cr>", { buffer = ev.buf, silent = true, desc = "Close window" })
-        end
-      '';
-    }
   ];
 
-  # No python3, Ruby, Node or Perl host providers. None of the plugins needs
-  # one; :checkhealth reports them as disabled, not broken.
-  # (nvim-jdtls still brings a python3 executable onto PATH; see java.nix.)
+  # No python3, Ruby, Node or Perl host providers. No plugin here needs one;
+  # :checkhealth reports them as disabled, not broken.
   withPython3 = false;
   withRuby = false;
   withNodeJs = false;
   withPerl = false;
-
-  # Startup without a plugin manager (every plugin comes from Nix):
-  # byte-compiled Lua, all plugins merged into one pack directory, and
-  # Neovim's module cache. lz.n lazy-loads the heavier plugins (lazy.nix), so
-  # startup stays under about 100 ms.
-  luaLoader.enable = true;
-  performance = {
-    byteCompileLua = {
-      enable = true;
-      nvimRuntime = true;
-      plugins = true;
-    };
-    combinePlugins.enable = true;
-  };
 }

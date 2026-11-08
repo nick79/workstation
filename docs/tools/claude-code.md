@@ -188,14 +188,11 @@ The file has a syntax error. Activation does not change the file.
 2. Repair the file, or restore it from a backup.
 3. Run `ws switch` again.
 
-## Claude Code and Neovim
+## Claude Code and IntelliJ IDEA
 
-Open Neovim in the project. Then run `/ide` in Claude Code to connect the two.
-Claude sees the current file and the selection, and Neovim shows each proposed
-edit as a diff.
-
-The keys start with `Space a`. See
-[neovim.md](neovim.md#claude-code-in-the-editor).
+With the Claude Code plugin in IntelliJ IDEA, Claude sees the current file and
+the selection, and IntelliJ IDEA shows each proposed edit as a diff. See
+[intellij.md](intellij.md#claude-code).
 
 ## See what Claude Code loaded
 
