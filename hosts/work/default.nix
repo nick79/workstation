@@ -75,10 +75,7 @@ in
 
   # Apps for this Mac only, on top of the shared list in modules/darwin/homebrew.nix.
   homebrew.casks = [
-    "chatgpt"
-    "codex"
     "google-chrome"
-    "parallels"
     "slack"
   ];
 

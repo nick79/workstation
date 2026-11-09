@@ -13,8 +13,13 @@
 
     casks = [
       "bbedit"
+      # ChatGPT desktop and the Codex app, OpenAI's desktop assistant and
+      # coding agent. Both update themselves and ask for an OpenAI login at
+      # first start.
+      "chatgpt"
       "claude"
       "claude-code@latest"
+      "codex"
       "firefox"
       "font-jetbrains-mono-nerd-font"
       "ghostty"
@@ -22,6 +27,9 @@
       # IntelliJ IDEA Ultimate, the development IDE (docs/tools/intellij.md).
       # It updates itself; the cask also installs the `idea` command.
       "intellij-idea"
+      # Parallels Desktop, for virtual machines. It updates itself. Each Mac
+      # needs its own license or trial, activated in the app.
+      "parallels"
       "rectangle"
       "the-unarchiver"
       "typora"

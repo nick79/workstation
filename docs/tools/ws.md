@@ -218,6 +218,27 @@ This example adds Zoom to the `work` Mac only.
 
 To find the name of a cask, run `brew search zoom`.
 
+### Add an application to all Macs
+
+This example moves the Codex app from the `work` Mac to all Macs.
+
+1. Delete `"codex"` from `homebrew.casks` in `hosts/work/default.nix`.
+2. Add `"codex"` to `homebrew.casks` in `modules/darwin/homebrew.nix`. Keep
+   the list in alphabetical order.
+3. Run `ws build`. On a Mac that does not have the application, the last
+   section of the output shows the new cask:
+
+   ```text
+   ==> Homebrew declaration
+     + cask codex
+   ```
+
+   On the `work` Mac the section shows `No changes.`, because the declaration
+   of that Mac contains the cask before and after the move.
+
+4. Run `ws switch`. Activation installs the cask on the Mac that does not have
+   it.
+
 ### Update all software one time each week
 
 ```bash

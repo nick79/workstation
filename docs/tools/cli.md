@@ -53,7 +53,7 @@ $ fd -e nix . modules/darwin -x wc -l
      193 modules/darwin/macos-defaults.nix
       24 modules/darwin/user.nix
       44 modules/darwin/default.nix
-      37 modules/darwin/homebrew.nix
+      48 modules/darwin/homebrew.nix
 ```
 
 ## Search in files: ripgrep (`rg`)
@@ -85,7 +85,7 @@ Example: find a setting with its line number.
 
 ```console
 $ rg -n cleanup modules/darwin/homebrew.nix
-30:      cleanup = "none";
+41:      cleanup = "none";
 ```
 
 Note: when `rg` finds no match, it writes nothing and its exit status is 1.
