@@ -485,6 +485,7 @@ bootstrap:
 |---|---|
 | Start the container runtime | `colima start`, when containers are necessary. The bootstrap only installs Colima. It creates no VM and starts nothing. A project that uses more resources supplies its own named profile and flags |
 | Install a Python interpreter | `uv python install`. Python comes from uv, not from Nix |
+| Install the uv tools of this Mac | `uv tool install <name>` for each tool in the uv tool table of [ws.md](tools/ws.md#add-a-python-command-line-tool-with-uv). For example, the `work` Mac needs `semgrep` |
 | Set the Git email address of this Mac | `git config --file ~/.config/git/local user.email <address>`, one time. The address is not in the repository. Until you set it, Git refuses to commit |
 | Sign in to the applications | Sign in and restore the credentials of each application |
 | Restore the SSH keys | Restore the keys and all other secret data from your password manager |

@@ -155,6 +155,41 @@ This example adds `hyperfine`.
 
 To find the name of a package, run `nix search nixpkgs hyperfine`.
 
+### Add a Python command-line tool with uv
+
+Some Python tools pin exact versions of their libraries. nixpkgs has one
+version of each Python library, and a flake update can move a library past the
+pin of the tool. The build of the tool then fails, and `ws build` fails with
+it. Install such a tool with uv. uv gives each tool its own environment with
+the versions that the tool pins.
+
+This example installs semgrep. The `work` Mac uses it.
+
+1. Install the tool:
+
+   ```bash
+   uv tool install semgrep
+   ```
+
+2. Make sure that the shell finds the uv copy:
+
+   ```console
+   $ which semgrep
+   /Users/alice/.local/bin/semgrep
+   ```
+
+3. Add a comment to the host file or the module where the tool belongs, for
+   example `hosts/work/default.nix`. The configuration does not install uv
+   tools, so the comment is the only record. On a new Mac, install the tool
+   again.
+
+`ws tools` and `ws upgrade` update all uv tools. `ws remove semgrep` removes
+the tool.
+
+| uv tool | Mac | Reason |
+|---|---|---|
+| `semgrep` | `work` | semgrep imports the `mcp` library at start. nixpkgs moved `mcp` to 2.x, and the nixpkgs build of semgrep failed |
+
 ### Add an application to one Mac
 
 A GUI application is a Homebrew cask. The shared list is `homebrew.casks` in

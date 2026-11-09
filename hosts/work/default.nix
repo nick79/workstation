@@ -58,14 +58,6 @@ let
     '';
     meta = old.meta // { platforms = lib.platforms.unix; };
   });
-
-  # semgrep pins pyjwt~=2.13.0, but nixpkgs moved pyjwt to 2.14.0 and the
-  # runtime dependency check fails the build. A minor pyjwt release keeps
-  # its API, so relax the pin as nixpkgs does for semgrep's other
-  # dependencies. Drop this once nixpkgs relaxes or bumps it.
-  semgrep = pkgs.semgrep.overridePythonAttrs (old: {
-    pythonRelaxDeps = (old.pythonRelaxDeps or [ ]) ++ [ "pyjwt" ];
-  });
 in
 {
   # The account; every home path derives from it (modules/darwin/user.nix).
@@ -91,11 +83,14 @@ in
   ];
 
   home-manager.users.milannikicnik = {
-    # Security tooling for this Mac only: CycloneDX SBOMs, static analysis,
-    # and ZAP (a GUI app, started with `zap`).
+    # Security tooling for this Mac only: CycloneDX SBOMs and ZAP (a GUI app,
+    # started with `zap`). semgrep is a uv tool, not a Nix package
+    # (`uv tool install semgrep`, docs/tools/ws.md): it imports the `mcp`
+    # library at start, and nixpkgs moves its Python libraries (pyjwt, mcp
+    # 2.x) ahead of semgrep's pins, which broke the build after flake updates.
+    # The PyPI release brings the versions that semgrep pins.
     home.packages = [
       pkgs.cdxgen
-      semgrep
       zap
     ];
 
